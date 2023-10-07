@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/loancontroller")
+@RequestMapping("/loan")
 @Log4j2
 public class LoanController {
 
