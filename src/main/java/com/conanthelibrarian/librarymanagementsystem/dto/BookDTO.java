@@ -13,7 +13,7 @@ public class BookDTO {
     private Integer bookId;
     private String title;
     private String author;
-    private Integer isbn;
+    private Long isbn;
     private String genre;
     private Integer availableCopies;
 

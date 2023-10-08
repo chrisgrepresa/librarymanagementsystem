@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -18,4 +19,10 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
 
+    public List<BookDTO> findBook(){
+        return bookRepository.findAll().stream()
+                .map(bookMapper::bookToBookDTO)
+                .collect(Collectors.toList());
+    }
+    //todo LOGS
 }
