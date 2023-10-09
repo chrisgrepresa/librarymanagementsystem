@@ -1,5 +1,7 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
+import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
+import com.conanthelibrarian.librarymanagementsystem.dao.User;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.LoanMapper;
@@ -26,4 +28,9 @@ public class LoanService {
     }
 
     //todo LOGS
+
+    public void newLoan (LoanDTO loanDTO){
+        Loan loan = loanMapper.loanDTOToLoan(loanDTO);
+        loanRepository.save(loan);
+    }
 }

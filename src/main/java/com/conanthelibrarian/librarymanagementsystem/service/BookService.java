@@ -1,7 +1,9 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.Book;
+import com.conanthelibrarian.librarymanagementsystem.dao.User;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
+import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.BookMapper;
 import com.conanthelibrarian.librarymanagementsystem.repository.BookRepository;
 import lombok.AllArgsConstructor;
@@ -25,4 +27,9 @@ public class BookService {
                 .collect(Collectors.toList());
     }
     //todo LOGS
+
+    public void newBook (BookDTO bookDTO){
+        Book book = bookMapper.bookDTOToBook(bookDTO);
+        bookRepository.save(book);
+    }
 }

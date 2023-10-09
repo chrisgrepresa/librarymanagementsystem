@@ -5,9 +5,7 @@ import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.BookService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,10 +18,16 @@ public class BookController {
 
     private final BookService bookService;
 
+    //todo LOGs y ResponeEntity
+
     @GetMapping("/all")
     public List<BookDTO> findAllBook(){
         return bookService.findBook();
     }
 
+    @PostMapping("/new")
+    public void newBook(@RequestBody BookDTO bookDTO){
+        bookService.newBook(bookDTO);
+    }
 
 }
