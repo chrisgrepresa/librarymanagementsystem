@@ -11,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,15 +22,31 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
 
+    //todo LOGS
+
     public List<BookDTO> findBook(){
         return bookRepository.findAll().stream()
                 .map(bookMapper::bookToBookDTO)
                 .collect(Collectors.toList());
     }
-    //todo LOGS
 
     public void newBook (BookDTO bookDTO){
         Book book = bookMapper.bookDTOToBook(bookDTO);
         bookRepository.save(book);
+    }
+
+    public List<BookDTO> findBookById(Integer id){
+        return bookRepository.findById(id).stream()
+                .map(bookMapper::bookToBookDTO)
+                .collect(Collectors.toList());
+    }
+
+    public BookDTO modifyBook(Integer id, BookDTO bookDTO){
+        Optional<Book> bookOptional = bookRepository.findById(id);
+        if(bookOptional.isPresent()){
+            Book book = bookMapper.bookDTOToBook(bookDTO);
+            bookRepository.save(book);
+        }
+        return bookDTO;
     }
 }

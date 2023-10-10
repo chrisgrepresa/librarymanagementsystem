@@ -30,16 +30,27 @@ public class UserController {
     }
 
     @GetMapping("/find/{id}")
-    public List<UserDTO> findAllUser(@PathVariable String id){
+    public List<UserDTO> findUserById(@PathVariable String id){
         return userService.findUserById(Integer.parseInt(id));
     }
 
     @PutMapping("/modify/{id}")
-    public UserDTO modifyMovie (@PathVariable String id, @RequestBody UserDTO userDTO)
+    public UserDTO modifyUser (@PathVariable String id, @RequestBody UserDTO userDTO)
     {
         userService.modifyUser(Integer.parseInt(id), userDTO);
         return userDTO;
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable String id){
+        try{
+            userService.deleteUserById(Integer.parseInt(id));
+            log.info("User deleted with Id: {}", id);
+            return ResponseEntity.status(200).body("User deleted");
+        }catch(Exception e){
+            return ResponseEntity.status(500).body("Error when deleting user: " +
+                    e.getMessage());
+        }
+    }
 
 }

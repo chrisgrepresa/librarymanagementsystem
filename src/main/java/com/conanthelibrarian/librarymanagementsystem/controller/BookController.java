@@ -30,4 +30,17 @@ public class BookController {
         bookService.newBook(bookDTO);
     }
 
+    @GetMapping("/find/{id}")
+    public List<BookDTO> findBookById(@PathVariable String id){
+        return bookService.findBookById(Integer.parseInt(id));
+    }
+
+    @PutMapping("/modify/{id}")
+    public BookDTO modifyBook (@PathVariable String id, @RequestBody BookDTO bookDTO)
+    {
+        bookService.modifyBook(Integer.parseInt(id), bookDTO);
+        return bookDTO;
+    }
+
+
 }

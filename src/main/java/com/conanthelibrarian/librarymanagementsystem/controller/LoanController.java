@@ -28,5 +28,15 @@ public class LoanController {
         loanService.newLoan(loanDTO);
     }
 
+    @GetMapping("/find/{id}")
+    public List<LoanDTO> findLoanById(@PathVariable String id){
+        return loanService.findLoanById(Integer.parseInt(id));
+    }
 
+    @PutMapping("/modify/{id}")
+    public LoanDTO modifyLoan (@PathVariable String id, @RequestBody LoanDTO loanDTO)
+    {
+        loanService.modifyLoan(Integer.parseInt(id), loanDTO);
+        return loanDTO;
+    }
 }
