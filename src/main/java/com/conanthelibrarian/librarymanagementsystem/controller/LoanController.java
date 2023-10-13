@@ -1,13 +1,15 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
-import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.LoanService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -17,26 +19,46 @@ public class LoanController {
 
     private final LoanService loanService;
 
-    //todo LOGs y ResponeEntity
-    @GetMapping("/all")
-    public List<LoanDTO> findAllLoan(){
-        return loanService.findLoan();
-    }
 
-    @PostMapping("/new")
-    public void newLoan(@RequestBody LoanDTO loanDTO){
-        loanService.newLoan(loanDTO);
+    @GetMapping("/all")
+    public ResponseEntity<List<LoanDTO>> findAllLoan(){
+        if(loanService.findLoan().isEmpty()){
+            return new ResponseEntity<>(loanService.findLoan(), HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(loanService.findLoan(), HttpStatus.OK);
     }
 
     @GetMapping("/find/{id}")
-    public List<LoanDTO> findLoanById(@PathVariable String id){
-        return loanService.findLoanById(Integer.parseInt(id));
+    public ResponseEntity<Optional<LoanDTO>> findLoanById(@PathVariable String id){
+        if(loanService.findLoanById(Integer.parseInt(id)).isEmpty()){
+            log.info("Loan not found with ID:{}", id);
+            return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(id)),HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(id)),HttpStatus.OK);
+    }
+
+
+    @PostMapping("/new")
+    public ResponseEntity<String> newLoan(@RequestBody LoanDTO loanDTO){
+        try{
+            loanService.newLoan(loanDTO);
+            log.info("New loan saved");
+            return ResponseEntity.status(200).body("New loan saved");
+        }catch(Exception e){
+            log.info("Error when saving loan: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
+        }
     }
 
     @PutMapping("/modify/{id}")
-    public LoanDTO modifyLoan (@PathVariable String id, @RequestBody LoanDTO loanDTO)
-    {
-        loanService.modifyLoan(Integer.parseInt(id), loanDTO);
-        return loanDTO;
+    public ResponseEntity<String> modifyLoan(@PathVariable String id, @RequestBody LoanDTO loanDTO) {
+        try {
+            loanService.modifyLoan(Integer.parseInt(id), loanDTO);
+            log.info("New loan modified");
+            return ResponseEntity.status(200).body("New loan modified");
+        } catch (Exception e) {
+            log.info("Error when saving loan: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
+        }
     }
 }

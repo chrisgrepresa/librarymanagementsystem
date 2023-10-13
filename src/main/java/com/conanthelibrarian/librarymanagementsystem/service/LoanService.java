@@ -32,15 +32,16 @@ public class LoanService {
                 .collect(Collectors.toList());
     }
 
+    public Optional<LoanDTO> findLoanById(Integer id){
+        return loanRepository.findById(id).stream()
+                .map(loanMapper::loanToLoanDTO)
+                .findAny();
+    }
+
     public void newLoan (LoanDTO loanDTO){
         Loan loan = loanMapper.loanDTOToLoan(loanDTO);
         loanRepository.save(loan);
-    }
-
-    public List<LoanDTO> findLoanById(Integer id){
-        return loanRepository.findById(id).stream()
-                .map(loanMapper::loanToLoanDTO)
-                .collect(Collectors.toList());
+        log.info("Loan saved with id: {}", loanDTO.getLoanId());
     }
 
     public LoanDTO modifyLoan(Integer id, LoanDTO loanDTO){
@@ -48,6 +49,7 @@ public class LoanService {
         if(loanOptional.isPresent()){
             Loan loan = loanMapper.loanDTOToLoan(loanDTO);
             loanRepository.save(loan);
+            log.info("Loan modified with id: {}", loanDTO.getLoanId());
         }
         return loanDTO;
     }

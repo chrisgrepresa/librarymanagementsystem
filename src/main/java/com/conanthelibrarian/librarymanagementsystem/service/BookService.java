@@ -22,7 +22,6 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
 
-    //todo LOGS
 
     public List<BookDTO> findBook(){
         return bookRepository.findAll().stream()
@@ -30,15 +29,16 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
+    public Optional<BookDTO> findBookById(Integer id){
+        return bookRepository.findById(id).stream()
+                .map(bookMapper::bookToBookDTO)
+                .findAny();
+    }
+
     public void newBook (BookDTO bookDTO){
         Book book = bookMapper.bookDTOToBook(bookDTO);
         bookRepository.save(book);
-    }
-
-    public List<BookDTO> findBookById(Integer id){
-        return bookRepository.findById(id).stream()
-                .map(bookMapper::bookToBookDTO)
-                .collect(Collectors.toList());
+        log.info("Book saved with title: {}", bookDTO.getTitle());
     }
 
     public BookDTO modifyBook(Integer id, BookDTO bookDTO){
@@ -46,7 +46,17 @@ public class BookService {
         if(bookOptional.isPresent()){
             Book book = bookMapper.bookDTOToBook(bookDTO);
             bookRepository.save(book);
+            log.info("Book modified with title: {}", bookDTO.getTitle());
         }
         return bookDTO;
+    }
+
+    public void deleteBookById(Integer id) {
+        if(id != null){
+            BookDTO bookDTO = BookDTO.builder().build();
+            bookMapper.bookDTOToBook(bookDTO);
+            bookRepository.deleteById(id);
+            log.info("Book deleted with id: {}", bookDTO.getBookId());
+        }
     }
 }
