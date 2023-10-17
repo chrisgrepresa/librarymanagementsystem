@@ -60,15 +60,15 @@ public class UserController {
         }
     }
 
-    /*@DeleteMapping("/delete/{id}")
-        public ResponseEntity<String> deleteUser(@PathVariable String id){
-            try {
-                userService.deleteUserById(Integer.parseInt(id));
-                log.info("User deleted with Id: {}", id);
-                return ResponseEntity.status(200).body("User deleted");
-            } catch (Exception e) {
-                return ResponseEntity.status(500).body("Error when deleting user: " +
-                        e.getMessage());
-            }
-        }*/
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable String id) {
+        try {
+            userService.deleteUserById(Integer.parseInt(id));
+            log.info("User deleted with Id: {}", id);
+            return ResponseEntity.status(200).body("User deleted");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error when deleting user: " +
+                    e.getMessage());
+        }
+    }
 }

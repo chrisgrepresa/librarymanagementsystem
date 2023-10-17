@@ -51,19 +51,9 @@ public class UserService {
 
     public void deleteUserById(Integer id) {
         if(id != null){
-            UserDTO userDTO = UserDTO.builder().build();
-            userMapper.userDTOToUser(userDTO);
             userRepository.deleteById(id);
-            log.info("User deleted with id: {}", userDTO.getUserId());
+            log.info("User deleted with id: {}", id);
         }
-        /*Error:
-        Error when deleting user: could not execute statement
-        [Cannot delete or update a parent row: a foreign key constraint fails
-        (`library`.`loans`, CONSTRAINT `loans_ibfk_1` FOREIGN KEY (`user_id`)
-        REFERENCES `users` (`user_id`))]
-        [delete from users where user_id=?];
-        SQL [delete from users where user_id=?]; constraint [null]
-         */
     }
 
 

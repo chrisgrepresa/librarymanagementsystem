@@ -53,4 +53,11 @@ public class LoanService {
         }
         return loanDTO;
     }
+
+    public void deleteLoanById(Integer id) {
+        if(id != null){
+            loanRepository.deleteById(id);
+            log.info("Loan deleted with id: {}", id);
+        }
+    }
 }

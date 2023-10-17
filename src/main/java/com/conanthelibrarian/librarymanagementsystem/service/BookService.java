@@ -53,10 +53,8 @@ public class BookService {
 
     public void deleteBookById(Integer id) {
         if(id != null){
-            BookDTO bookDTO = BookDTO.builder().build();
-            bookMapper.bookDTOToBook(bookDTO);
             bookRepository.deleteById(id);
-            log.info("Book deleted with id: {}", bookDTO.getBookId());
+            log.info("Book deleted with id: {}", id);
         }
     }
 }

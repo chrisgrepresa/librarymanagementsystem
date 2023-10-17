@@ -61,4 +61,16 @@ public class LoanController {
             return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
         }
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteLoan(@PathVariable String id) {
+        try {
+            loanService.deleteLoanById(Integer.parseInt(id));
+            log.info("Loan deleted with Id: {}", id);
+            return ResponseEntity.status(200).body("Loan deleted");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error when deleting loan: " +
+                    e.getMessage());
+        }
+    }
 }
