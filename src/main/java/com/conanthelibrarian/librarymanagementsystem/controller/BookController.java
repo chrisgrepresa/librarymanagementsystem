@@ -74,12 +74,46 @@ public class BookController {
                     e.getMessage());
         }
     }
-    /*
-    Error when deleting book: could not execute statement
-    [Cannot delete or update a parent row: a foreign key constraint fails
-    (`library`.`loans`, CONSTRAINT `loans_ibfk_2` FOREIGN KEY (`book_id`)
-    REFERENCES `books` (`book_id`))] [delete from books where book_id=?];
-    SQL [delete from books where book_id=?]; constraint [null]
-     */
+
+    @GetMapping("/genre/{genre}")
+    public ResponseEntity<List<BookDTO>> findBookByGenre (@PathVariable String genre){
+        if(bookService.findBookByGenre(genre).isEmpty()){
+            log.info("Book not found with genre:{}", genre);
+            return new ResponseEntity<>(bookService.findBookByGenre(genre), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(bookService.findBookByGenre(genre), HttpStatus.OK);
+    }
+
+    @GetMapping("/loan")
+    public ResponseEntity<List<BookDTO>> findBookInLoan(){
+        if(bookService.findBookInLoan().isEmpty()){
+            log.info("No books found in Loan Database");
+            return new ResponseEntity<>(bookService.findBookInLoan(), HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(bookService.findBookInLoan(), HttpStatus.OK);
+    }
+
+    /*todo Comprobar esto. Este es el ejercicio realizado en el tren
+    @GetMapping("/available/{id}")
+    public ResponseEntity<Optional<BookDTO>> findAvailableBook(@PathVariable String id) {
+        if (bookService.findAvailableBook(Integer.parseInt(id)).isEmpty()) {
+            log.info("Book not found with ID:{}", id);
+            return new ResponseEntity<>(bookService.findAvailableBook(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(bookService.findAvailableBook(Integer.parseInt(id)), HttpStatus.OK);
+    }
+
+    /*@PutMapping("/available/reduce/{id}")
+    public ResponseEntity<String> reduceAvailableStock(@PathVariable String id, @RequestBody BookDTO bookDTO) {
+        try {
+            bookService.modifyStock(Integer.parseInt(id), bookDTO);
+            log.info("New book modified");
+            return ResponseEntity.status(200).body("New book modified");
+        } catch (Exception e) {
+            log.info("Error when saving book: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Error when saving book:" + e.getMessage());
+        }
+    }*/
+
 
 }

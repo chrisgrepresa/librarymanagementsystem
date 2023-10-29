@@ -8,8 +8,5 @@ import java.util.List;
 
 public interface LoanRepository extends JpaRepository<Loan, Integer> {
 
-    //todo Query personalizada
-    //- Recupera todos los libros que están actualmente en préstamo
-
 
 }

@@ -1,5 +1,6 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
+import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.UserService;
 import lombok.AllArgsConstructor;
@@ -71,4 +72,14 @@ public class UserController {
                     e.getMessage());
         }
     }
+
+  /*  @GetMapping("/loan")
+    public ResponseEntity<List<UserDTO>> findUserInLoan(){
+        if(userService.findUserInLoan().isEmpty()){
+            log.info("No users found in Loan Database");
+            return new ResponseEntity<>(userService.findUserInLoan(), HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(userService.findUserInLoan(), HttpStatus.OK);
+    }
+*/
 }

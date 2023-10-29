@@ -1,6 +1,7 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.User;
+import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.UserMapper;
 import com.conanthelibrarian.librarymanagementsystem.repository.UserRepository;
@@ -56,5 +57,9 @@ public class UserService {
         }
     }
 
+/*
+    public List<UserDTO> findUserInLoan(){
+        return userRepository.findUserInLoan();
+    }*/
 
 }
