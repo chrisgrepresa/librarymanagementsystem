@@ -73,13 +73,5 @@ public class UserController {
         }
     }
 
-  /*  @GetMapping("/loan")
-    public ResponseEntity<List<UserDTO>> findUserInLoan(){
-        if(userService.findUserInLoan().isEmpty()){
-            log.info("No users found in Loan Database");
-            return new ResponseEntity<>(userService.findUserInLoan(), HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(userService.findUserInLoan(), HttpStatus.OK);
-    }
-*/
+
 }

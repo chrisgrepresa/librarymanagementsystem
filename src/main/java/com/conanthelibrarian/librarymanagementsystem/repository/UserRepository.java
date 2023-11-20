@@ -2,6 +2,7 @@ package com.conanthelibrarian.librarymanagementsystem.repository;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.User;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
+import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,7 +25,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             u.role)
             FROM User u
             JOIN Loan l ON u.userId = l.userId
-            WHERE u.userId = l.userId
+            GROUP BY userId
+            HAVING COUNT(*)>1;
             """)
     List<UserDTO> findUserInLoan();*/
+
+
+
 }

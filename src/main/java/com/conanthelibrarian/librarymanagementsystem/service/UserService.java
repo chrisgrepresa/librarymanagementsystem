@@ -57,9 +57,5 @@ public class UserService {
         }
     }
 
-/*
-    public List<UserDTO> findUserInLoan(){
-        return userRepository.findUserInLoan();
-    }*/
 
 }
