@@ -9,13 +9,6 @@ import java.util.List;
 
 public interface LoanRepository extends JpaRepository<Loan, Integer> {
 
-    /*
-    @Query("""
-            SELECT userId
-            FROM Loan l
-            GROUP BY userId
-            HAVING COUNT(*)>1;
-            """)
-    List<LoanDTO> findUserInLoan;*/
+
 
 }

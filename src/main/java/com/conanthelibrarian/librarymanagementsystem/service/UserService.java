@@ -57,5 +57,8 @@ public class UserService {
         }
     }
 
+    public List<UserDTO> findUserInLoan(Integer quantity){
+        return userRepository.findUserInLoan(quantity);
+    }
 
 }

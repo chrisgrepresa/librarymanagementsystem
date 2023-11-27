@@ -13,8 +13,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    /*todo Query personalizada:
-    //- Recupera todos los usuarios que tienen prestados más de X libros.
 
     @Query("""
             SELECT new com.conanthelibrarian.librarymanagementsystem.dto.UserDTO
@@ -25,11 +23,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             u.role)
             FROM User u
             JOIN Loan l ON u.userId = l.userId
+            WHERE u.userId IN (
+            SELECT l.userId FROM Loan l
             GROUP BY userId
-            HAVING COUNT(*)>1;
+            HAVING COUNT(*)>= :quantity)
             """)
-    List<UserDTO> findUserInLoan();*/
-
+    List<UserDTO> findUserInLoan(@Param("quantity") Integer quantity);
 
 
 }

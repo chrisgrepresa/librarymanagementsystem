@@ -73,5 +73,13 @@ public class UserController {
         }
     }
 
+    @GetMapping("/loan/quantity/{quantity}")
+    public ResponseEntity<List<UserDTO>> findUserInLoan(@PathVariable Integer quantity){
+        if(userService.findUserInLoan(quantity).isEmpty()){
+            log.info("No users found in Loan Database");
+            return new ResponseEntity<>(userService.findUserInLoan(quantity), HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(userService.findUserInLoan(quantity), HttpStatus.OK);
+    }
 
 }
