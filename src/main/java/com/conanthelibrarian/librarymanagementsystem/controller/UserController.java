@@ -1,6 +1,5 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
-import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.UserService;
 import lombok.AllArgsConstructor;

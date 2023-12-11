@@ -1,7 +1,6 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.User;
-import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.UserMapper;
 import com.conanthelibrarian.librarymanagementsystem.repository.UserRepository;
@@ -9,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

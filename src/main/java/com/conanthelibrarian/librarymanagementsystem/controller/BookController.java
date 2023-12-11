@@ -1,8 +1,9 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
-import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
+import com.conanthelibrarian.librarymanagementsystem.repository.LoanRepository;
 import com.conanthelibrarian.librarymanagementsystem.service.BookService;
+import com.conanthelibrarian.librarymanagementsystem.service.LoanService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -93,7 +93,7 @@ public class BookController {
         return new ResponseEntity<>(bookService.findBookInLoan(), HttpStatus.OK);
     }
 
-    /*todo Comprobar esto. Este es el ejercicio realizado en el tren
+
     @GetMapping("/available/{id}")
     public ResponseEntity<Optional<BookDTO>> findAvailableBook(@PathVariable String id) {
         if (bookService.findAvailableBook(Integer.parseInt(id)).isEmpty()) {
@@ -101,6 +101,24 @@ public class BookController {
             return new ResponseEntity<>(bookService.findAvailableBook(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(bookService.findAvailableBook(Integer.parseInt(id)), HttpStatus.OK);
+    }
+
+
+    @GetMapping("/check/{bookId}")
+    public ResponseEntity<String> checkBookAvailability(@PathVariable Integer bookId, Integer userId) {
+        try {
+            if(bookService.checkBookAvailability(bookId, userId).equalsIgnoreCase("available")){
+                log.info("Book available with id: {}", bookId);
+                return ResponseEntity.status(200).body("The book is available");
+            }
+            else{
+                log.info("Book not available with id: {}", bookId);
+                return ResponseEntity.status(200).body("The book is not available");
+            }
+        } catch (Exception e) {
+            log.info("Error: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Error:" + e.getMessage());
+        }
     }
 
     /*@PutMapping("/available/reduce/{id}")
@@ -114,6 +132,4 @@ public class BookController {
             return ResponseEntity.status(500).body("Error when saving book:" + e.getMessage());
         }
     }*/
-
-
 }
