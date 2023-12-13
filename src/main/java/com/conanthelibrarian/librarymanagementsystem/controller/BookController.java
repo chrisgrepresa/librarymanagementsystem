@@ -1,10 +1,12 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
+import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.repository.LoanRepository;
 import com.conanthelibrarian.librarymanagementsystem.service.BookService;
 import com.conanthelibrarian.librarymanagementsystem.service.LoanService;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,7 @@ import java.util.Optional;
 public class BookController {
 
     private final BookService bookService;
-
+    private final LoanService loanService;
 
     @GetMapping("/all")
     public ResponseEntity<List<BookDTO>> findAllBook() {
@@ -103,33 +105,37 @@ public class BookController {
         return new ResponseEntity<>(bookService.findAvailableBook(Integer.parseInt(id)), HttpStatus.OK);
     }
 
-
-    @GetMapping("/check/{bookId}")
-    public ResponseEntity<String> checkBookAvailability(@PathVariable Integer bookId, Integer userId) {
-        try {
-            if(bookService.checkBookAvailability(bookId, userId).equalsIgnoreCase("available")){
+    @PostMapping("/check/{bookId}/loan/{userId}")
+    public ResponseEntity<String> checkBookAndNewLoan(@PathVariable Integer bookId, @PathVariable Integer userId,
+                                                      @RequestBody LoanDTO loanDTO, BookDTO bookDTO){
+        bookService.testingAvailability(bookId,userId,loanDTO, bookDTO);
+        try{
+            if(bookService.findAvailableBook(bookId).isPresent()){
                 log.info("Book available with id: {}", bookId);
-                return ResponseEntity.status(200).body("The book is available");
+                log.info("New loan saved");
+                return ResponseEntity.status(200).body("The book is available, new loan saved");
             }
             else{
                 log.info("Book not available with id: {}", bookId);
                 return ResponseEntity.status(200).body("The book is not available");
             }
-        } catch (Exception e) {
-            log.info("Error: {}", e.getMessage());
-            return ResponseEntity.status(500).body("Error:" + e.getMessage());
+        }catch(Exception e){
+            log.info("Error when saving loan: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
         }
     }
 
-    /*@PutMapping("/available/reduce/{id}")
+
+    @PutMapping("/available/reduce/{id}")
     public ResponseEntity<String> reduceAvailableStock(@PathVariable String id, @RequestBody BookDTO bookDTO) {
         try {
-            bookService.modifyStock(Integer.parseInt(id), bookDTO);
+            bookService.reduceAvailability(Integer.parseInt(id), bookDTO);
             log.info("New book modified");
             return ResponseEntity.status(200).body("New book modified");
         } catch (Exception e) {
             log.info("Error when saving book: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving book:" + e.getMessage());
         }
-    }*/
+    }
 }
+
