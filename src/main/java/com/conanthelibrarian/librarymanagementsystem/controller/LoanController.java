@@ -4,10 +4,12 @@ import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.LoanService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,30 +23,30 @@ public class LoanController {
 
 
     @GetMapping("/all")
-    public ResponseEntity<List<LoanDTO>> findAllLoan(){
-        if(loanService.findLoan().isEmpty()){
+    public ResponseEntity<List<LoanDTO>> findAllLoan() {
+        if (loanService.findLoan().isEmpty()) {
             return new ResponseEntity<>(loanService.findLoan(), HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(loanService.findLoan(), HttpStatus.OK);
     }
 
     @GetMapping("/find/{id}")
-    public ResponseEntity<Optional<LoanDTO>> findLoanById(@PathVariable String id){
-        if(loanService.findLoanById(Integer.parseInt(id)).isEmpty()){
+    public ResponseEntity<Optional<LoanDTO>> findLoanById(@PathVariable String id) {
+        if (loanService.findLoanById(Integer.parseInt(id)).isEmpty()) {
             log.info("Loan not found with ID:{}", id);
-            return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(id)),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(id)),HttpStatus.OK);
+        return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(id)), HttpStatus.OK);
     }
 
 
     @PostMapping("/new")
-    public ResponseEntity<String> newLoan(@RequestBody LoanDTO loanDTO){
-        try{
+    public ResponseEntity<String> newLoan(@RequestBody LoanDTO loanDTO) {
+        try {
             loanService.newLoan(loanDTO);
             log.info("New loan saved");
             return ResponseEntity.status(200).body("New loan saved");
-        }catch(Exception e){
+        } catch (Exception e) {
             log.info("Error when saving loan: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
         }
@@ -73,4 +75,34 @@ public class LoanController {
                     e.getMessage());
         }
     }
+
+    /*@GetMapping("/fee/{id}/{localdate}")
+    public void calculateDays(@PathVariable String id, @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate localDate,
+                              @RequestBody LoanDTO loanDTO) {
+        loanService.calculateDaysBetweenDates(Integer.parseInt(id), loanDTO, localDate);
+        //System.out.println(loanService.calculateDaysBetweenDates(Integer.parseInt(id), loanDTO, localDate));
+        log.info("Fee found");
+        /*try{
+            loanService.calculateFees(Integer.parseInt(id),loanDTO, localDate);
+            log.info("Fee found");
+            return ResponseEntity.status(200).body("Fee found");
+        }catch(Exception e){
+            log.info("Error when saving loan: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
+        }
+    }*/
+
+    @GetMapping("/fee/{id}/{localdate}")
+    public ResponseEntity<String> findFeeById(@PathVariable String id,
+                                              @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate localdate,
+                                                         @RequestBody LoanDTO loanDTO) {
+        if(loanService.calculateFees(Integer.parseInt(id),localdate, loanDTO).isEmpty()){
+            log.info("Loan not found with ID:{}", id);
+            return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id),localdate, loanDTO),
+                    HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id),localdate, loanDTO), HttpStatus.OK);
+
+    }
+
 }

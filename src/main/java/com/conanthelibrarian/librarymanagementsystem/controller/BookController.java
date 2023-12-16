@@ -2,11 +2,9 @@ package com.conanthelibrarian.librarymanagementsystem.controller;
 
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
-import com.conanthelibrarian.librarymanagementsystem.repository.LoanRepository;
 import com.conanthelibrarian.librarymanagementsystem.service.BookService;
 import com.conanthelibrarian.librarymanagementsystem.service.LoanService;
 import lombok.AllArgsConstructor;
-import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -108,7 +106,7 @@ public class BookController {
     @PostMapping("/check/{bookId}/loan/{userId}")
     public ResponseEntity<String> checkBookAndNewLoan(@PathVariable Integer bookId, @PathVariable Integer userId,
                                                       @RequestBody LoanDTO loanDTO, BookDTO bookDTO){
-        bookService.testingAvailability(bookId,userId,loanDTO, bookDTO);
+        bookService.testAvailability(bookId,userId,loanDTO, bookDTO);
         try{
             if(bookService.findAvailableBook(bookId).isPresent()){
                 log.info("Book available with id: {}", bookId);
@@ -129,7 +127,7 @@ public class BookController {
     @PutMapping("/available/reduce/{id}")
     public ResponseEntity<String> reduceAvailableStock(@PathVariable String id, @RequestBody BookDTO bookDTO) {
         try {
-            bookService.reduceAvailability(Integer.parseInt(id), bookDTO);
+            bookService.reduceBookQuantity(Integer.parseInt(id), bookDTO);
             log.info("New book modified");
             return ResponseEntity.status(200).body("New book modified");
         } catch (Exception e) {

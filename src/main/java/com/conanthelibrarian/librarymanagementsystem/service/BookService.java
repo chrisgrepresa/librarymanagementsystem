@@ -67,25 +67,26 @@ public class BookService {
     }
 
 
-    public void testingAvailability(Integer bookId, Integer userId, LoanDTO loanDTO, BookDTO bookDTO){
+    public void testAvailability(Integer bookId, Integer userId, LoanDTO loanDTO, BookDTO bookDTO){
         try{
             findAvailableBook(bookId);
             if(findAvailableBook(bookId).isEmpty()){
                 System.out.println("Not available");
             } else{
                 System.out.println("Available");
-                loanDTO.setUserId(userId);
-                loanDTO.setBookId(bookId);
-                loanService.newLoan(loanDTO);
-                // Esto no funciona: bookDTO.setAvailableCopies(500);
-                // Pero a lo mejor podría funcionar un .stream con un mapeo
-                // Y cuando esté tod0, extraer un método
+                //loanDTO.setUserId(userId);
+                //loanDTO.setBookId(bookId);
+                //loanService.newLoan(loanDTO);
+                //bookDTO.setAvailableCopies(500);
+                //modifyBook(bookId, bookDTO);
+                //1.modificar bookDTO
+                //2. guardar en book.Service.modifyBook(bookDTO)
+                //reduceBookQuantity(bookId, bookDTO);
             }
         }catch(Exception e){
             System.out.println("Error");
         }
     }
-
 
     public Optional<BookDTO> findAvailableBook(Integer bookId){
         return bookRepository.findById(bookId).stream()
@@ -94,21 +95,14 @@ public class BookService {
                 .findAny();
     }
 
-    //todo esto no ha funcionado, pero se puede modificar o probar un mapper:
-    public BookDTO reduceAvailability(Integer id, BookDTO bookDTO){
-        /* Optional<Book> bookOptional = bookRepository.findById(id);
+    public BookDTO reduceBookQuantity(Integer id, BookDTO bookDTO){
+        Optional<Book> bookOptional = bookRepository.findById(id);
         if(bookOptional.isPresent()){
+            bookDTO.setAvailableCopies(500);
             Book book = bookMapper.bookDTOToBook(bookDTO);
-            book.setAvailableCopies(500);
             bookRepository.save(book);
-            log.info("Book modified with title: {}", bookDTO.getTitle());
-        }*/
+            log.info("Book quantity reduced with Id: {}", bookDTO.getBookId());
+        }
         return bookDTO;
     }
-
-//                .map(book -> book.setAvailableCopies(book.getAvailableCopies()))
-    //2. Reflejar el nuevo préstamo en la BBDD.
-    //3. Reducir el stock en 1
-
-
 }
