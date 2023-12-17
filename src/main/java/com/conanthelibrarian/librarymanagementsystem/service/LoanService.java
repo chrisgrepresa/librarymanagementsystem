@@ -6,9 +6,12 @@ import com.conanthelibrarian.librarymanagementsystem.mapper.LoanMapper;
 import com.conanthelibrarian.librarymanagementsystem.repository.LoanRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,30 +60,9 @@ public class LoanService {
         }
     }
 
-    public String calculateFees(Integer loanId, LocalDate localdate, LoanDTO loanDTO){
-        Long days = calculateDays(loanId, localdate, loanDTO);
-        if(days <5){
-            log.info("multa 1");
-            return "multa 1";
-        }
-        else if (days <15){
-            log.info("multa 2");
-            return "multa 2";
-        }
-        else if(days <30){
-            log.info("multa 3");
-            return "multa 3";
-        }
-        else {
-            log.info("multa 4");
-            return "multa 4";
-        }
-    }
-
-
-    public Long calculateDays(Integer loanId, LocalDate localDate, LoanDTO loanDTO){
+    public Long calculateFees(Integer loanId, LocalDate localDate){
         return loanRepository.findById(loanId).stream()
-                .map(loan -> localDate.compareTo(loan.getDueDate()))
+                .map(loan -> Duration.between(loan.getDueDate(), localDate).toDays())
                 .count();
     }
 

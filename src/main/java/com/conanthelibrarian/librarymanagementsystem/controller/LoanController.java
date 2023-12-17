@@ -76,33 +76,12 @@ public class LoanController {
         }
     }
 
-    /*@GetMapping("/fee/{id}/{localdate}")
-    public void calculateDays(@PathVariable String id, @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate localDate,
-                              @RequestBody LoanDTO loanDTO) {
-        loanService.calculateDaysBetweenDates(Integer.parseInt(id), loanDTO, localDate);
-        //System.out.println(loanService.calculateDaysBetweenDates(Integer.parseInt(id), loanDTO, localDate));
-        log.info("Fee found");
-        /*try{
-            loanService.calculateFees(Integer.parseInt(id),loanDTO, localDate);
-            log.info("Fee found");
-            return ResponseEntity.status(200).body("Fee found");
-        }catch(Exception e){
-            log.info("Error when saving loan: {}", e.getMessage());
-            return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
+    @GetMapping("/fee/{id}/{localDate}")
+    public ResponseEntity<Long> findFeeById(@PathVariable String id,
+                                              @PathVariable String localDate) {
+        if (loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)) == null) {
+            return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.NO_CONTENT);
         }
-    }*/
-
-    @GetMapping("/fee/{id}/{localdate}")
-    public ResponseEntity<String> findFeeById(@PathVariable String id,
-                                              @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate localdate,
-                                                         @RequestBody LoanDTO loanDTO) {
-        if(loanService.calculateFees(Integer.parseInt(id),localdate, loanDTO).isEmpty()){
-            log.info("Loan not found with ID:{}", id);
-            return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id),localdate, loanDTO),
-                    HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id),localdate, loanDTO), HttpStatus.OK);
-
+        return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.OK);
     }
-
 }
