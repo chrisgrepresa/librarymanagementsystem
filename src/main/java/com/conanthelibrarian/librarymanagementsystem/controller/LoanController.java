@@ -4,7 +4,6 @@ import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.LoanService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -77,8 +76,9 @@ public class LoanController {
     }
 
     @GetMapping("/fee/{id}/{localDate}")
-    public ResponseEntity<Long> findFeeById(@PathVariable String id,
-                                              @PathVariable String localDate) {
+    public ResponseEntity<String> findFeeByIdTwo(@PathVariable String id,
+                                            @PathVariable String localDate) {
+
         if (loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)) == null) {
             return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.NO_CONTENT);
         }
