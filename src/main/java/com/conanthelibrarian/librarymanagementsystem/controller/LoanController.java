@@ -84,4 +84,5 @@ public class LoanController {
         }
         return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.OK);
     }
+
 }

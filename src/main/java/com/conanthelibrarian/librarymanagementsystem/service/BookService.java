@@ -20,7 +20,6 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
-    private final LoanService loanService;
 
 
     public List<BookDTO> findBook(){
@@ -105,4 +104,7 @@ public class BookService {
         }
         return bookDTO;
     }
+
+
+
 }

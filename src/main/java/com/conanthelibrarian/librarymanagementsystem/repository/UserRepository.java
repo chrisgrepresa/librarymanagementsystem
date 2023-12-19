@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             GROUP BY userId
             HAVING COUNT(*)>= :quantity)
             """)
-    List<UserDTO> findUserInLoan(@Param("quantity") Integer quantity);
+    List<UserDTO> findUserInLoanForQuantity(@Param("quantity") Integer quantity);
 
 
 }

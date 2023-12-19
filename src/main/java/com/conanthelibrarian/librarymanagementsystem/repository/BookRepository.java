@@ -1,6 +1,7 @@
 package com.conanthelibrarian.librarymanagementsystem.repository;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.Book;
+import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,5 +37,7 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             WHERE b.bookId = l.bookId
             """)
     List<BookDTO> findBooksInLoan();
+
+    //public List<Book> findBookByUserId (Integer userId);
 
 }

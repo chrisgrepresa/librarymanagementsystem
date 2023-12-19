@@ -83,5 +83,4 @@ public class LoanService {
         return "This case is not possible";
         //todo esto se puede mejorar con los SOUT en una clase de Constantes.
     }
-
 }

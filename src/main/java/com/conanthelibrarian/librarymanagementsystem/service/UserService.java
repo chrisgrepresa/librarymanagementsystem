@@ -1,13 +1,22 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
+import com.conanthelibrarian.librarymanagementsystem.dao.Book;
+import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dao.User;
+import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
+import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
+import com.conanthelibrarian.librarymanagementsystem.mapper.BookMapper;
+import com.conanthelibrarian.librarymanagementsystem.mapper.LoanMapper;
 import com.conanthelibrarian.librarymanagementsystem.mapper.UserMapper;
+import com.conanthelibrarian.librarymanagementsystem.repository.BookRepository;
+import com.conanthelibrarian.librarymanagementsystem.repository.LoanRepository;
 import com.conanthelibrarian.librarymanagementsystem.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +28,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final LoanRepository loanRepository;
+    private final BookRepository bookRepository;
+    private final BookMapper bookMapper;
 
     public List<UserDTO> findUser(){
         return userRepository.findAll().stream()
@@ -56,7 +68,11 @@ public class UserService {
     }
 
     public List<UserDTO> findUserInLoan(Integer quantity){
-        return userRepository.findUserInLoan(quantity);
+        return userRepository.findUserInLoanForQuantity(quantity);
     }
 
+
+     public List<Loan> loanPerUser(Integer userId){
+        return loanRepository.findByUserId(userId);
+    }
 }
