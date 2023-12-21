@@ -1,8 +1,10 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
+import com.conanthelibrarian.librarymanagementsystem.dao.Book;
 import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.LoanMapper;
+import com.conanthelibrarian.librarymanagementsystem.repository.BookRepository;
 import com.conanthelibrarian.librarymanagementsystem.repository.LoanRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +23,7 @@ public class LoanService {
 
     private final LoanRepository loanRepository;
     private final LoanMapper loanMapper;
+    private final BookRepository bookRepository;
 
 
     public List<LoanDTO> findLoan(){
@@ -83,4 +86,5 @@ public class LoanService {
         return "This case is not possible";
         //todo esto se puede mejorar con los SOUT en una clase de Constantes.
     }
+
 }

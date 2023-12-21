@@ -17,6 +17,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,27 +33,27 @@ public class UserService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
 
-    public List<UserDTO> findUser(){
+    public List<UserDTO> findUser() {
         return userRepository.findAll().stream()
                 .map(userMapper::userToUserDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<UserDTO> findUserById(Integer id){
+    public Optional<UserDTO> findUserById(Integer id) {
         return userRepository.findById(id).stream()
                 .map(userMapper::userToUserDTO)
                 .findAny();
     }
 
-    public void newUser (UserDTO userDTO){
+    public void newUser(UserDTO userDTO) {
         User user = userMapper.userDTOToUser(userDTO);
         userRepository.save(user);
         log.info("User saved with name: {}", userDTO.getName());
     }
 
-    public UserDTO modifyUser(Integer id, UserDTO userDTO){
+    public UserDTO modifyUser(Integer id, UserDTO userDTO) {
         Optional<User> userOptional = userRepository.findById(id);
-        if(userOptional.isPresent()){
+        if (userOptional.isPresent()) {
             User user = userMapper.userDTOToUser(userDTO);
             userRepository.save(user);
             log.info("User modified with name: {}", userDTO.getName());
@@ -61,18 +62,35 @@ public class UserService {
     }
 
     public void deleteUserById(Integer id) {
-        if(id != null){
+        if (id != null) {
             userRepository.deleteById(id);
             log.info("User deleted with id: {}", id);
         }
     }
 
-    public List<UserDTO> findUserInLoan(Integer quantity){
+    public List<UserDTO> findUserInLoan(Integer quantity) {
         return userRepository.findUserInLoanForQuantity(quantity);
     }
 
+    public List<BookDTO> findBookPerUser(Integer userId) {
+        for (Loan loans : loanPerUser(userId)) {
+            List<BookDTO> listOfBooks = bookRepository.findAll().stream()
+                    .filter(book -> loanPerUser(userId).stream()
+                            .anyMatch(loan ->
+                                    loan.getUserId().equals(userId) && book.getBookId().equals(loan.getBookId()) )
+                    )
+                    .map(bookMapper::bookToBookDTO)
+                    .collect(Collectors.toList());
+            log.info("List of books for userId{} : {} ", userId, listOfBooks);
+            return listOfBooks;
+        }
+        log.info("Does not work");
+        return null;
+    }
 
-     public List<Loan> loanPerUser(Integer userId){
+
+    public List<Loan> loanPerUser(Integer userId) {
         return loanRepository.findByUserId(userId);
     }
+
 }

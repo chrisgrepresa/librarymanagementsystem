@@ -85,6 +85,11 @@ public class UserController {
         return new ResponseEntity<>(userService.findUserInLoan(quantity), HttpStatus.OK);
     }
 
+    @GetMapping("/book/{userId}")
+    public List<BookDTO> bookPerUser(@PathVariable String userId, Integer loanId){
+        return userService.findBookPerUser(Integer.parseInt(userId));
+    }
+
     @GetMapping("/book/loan/{userId}")
     public List<Loan> loanPerUser(@PathVariable Integer userId){
         return userService.loanPerUser(userId);

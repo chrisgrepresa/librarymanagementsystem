@@ -38,6 +38,5 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             """)
     List<BookDTO> findBooksInLoan();
 
-    //public List<Book> findBookByUserId (Integer userId);
 
 }

@@ -1,5 +1,6 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
+import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.BookService;
@@ -136,7 +137,6 @@ public class BookController {
             return ResponseEntity.status(500).body("Error when saving book:" + e.getMessage());
         }
     }
-
 
 }
 

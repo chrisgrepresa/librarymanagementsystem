@@ -1,5 +1,7 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
+import com.conanthelibrarian.librarymanagementsystem.dao.Book;
+import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.LoanService;
 import lombok.AllArgsConstructor;
@@ -84,5 +86,6 @@ public class LoanController {
         }
         return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.OK);
     }
+
 
 }

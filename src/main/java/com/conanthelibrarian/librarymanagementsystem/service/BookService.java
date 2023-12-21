@@ -1,6 +1,7 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.Book;
+import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.BookMapper;
