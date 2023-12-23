@@ -1,13 +1,10 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
-import com.conanthelibrarian.librarymanagementsystem.dao.Book;
 import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dao.User;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
-import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.BookMapper;
-import com.conanthelibrarian.librarymanagementsystem.mapper.LoanMapper;
 import com.conanthelibrarian.librarymanagementsystem.mapper.UserMapper;
 import com.conanthelibrarian.librarymanagementsystem.repository.BookRepository;
 import com.conanthelibrarian.librarymanagementsystem.repository.LoanRepository;
@@ -16,8 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,7 +28,7 @@ public class UserService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
 
-    public List<UserDTO> findUser() {
+    public List<UserDTO> findAllUser() {
         return userRepository.findAll().stream()
                 .map(userMapper::userToUserDTO)
                 .collect(Collectors.toList());
@@ -45,7 +40,7 @@ public class UserService {
                 .findAny();
     }
 
-    public void newUser(UserDTO userDTO) {
+    public void createNewUser(UserDTO userDTO) {
         User user = userMapper.userDTOToUser(userDTO);
         userRepository.save(user);
         log.info("User saved with name: {}", userDTO.getName());
@@ -73,9 +68,9 @@ public class UserService {
     }
 
     public List<BookDTO> findBookPerUser(Integer userId) {
-        for (Loan loans : loanPerUser(userId)) {
+        for (Loan loans : showLoanPerUser(userId)) {
             List<BookDTO> listOfBooks = bookRepository.findAll().stream()
-                    .filter(book -> loanPerUser(userId).stream()
+                    .filter(book -> showLoanPerUser(userId).stream()
                             .anyMatch(loan ->
                                     loan.getUserId().equals(userId) && book.getBookId().equals(loan.getBookId()) )
                     )
@@ -89,7 +84,7 @@ public class UserService {
     }
 
 
-    public List<Loan> loanPerUser(Integer userId) {
+    public List<Loan> showLoanPerUser(Integer userId) {
         return loanRepository.findByUserId(userId);
     }
 

@@ -1,7 +1,5 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
-import com.conanthelibrarian.librarymanagementsystem.dao.Book;
-import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.LoanService;
 import lombok.AllArgsConstructor;
@@ -25,10 +23,10 @@ public class LoanController {
 
     @GetMapping("/all")
     public ResponseEntity<List<LoanDTO>> findAllLoan() {
-        if (loanService.findLoan().isEmpty()) {
-            return new ResponseEntity<>(loanService.findLoan(), HttpStatus.NO_CONTENT);
+        if (loanService.findAllLoan().isEmpty()) {
+            return new ResponseEntity<>(loanService.findAllLoan(), HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(loanService.findLoan(), HttpStatus.OK);
+        return new ResponseEntity<>(loanService.findAllLoan(), HttpStatus.OK);
     }
 
     @GetMapping("/find/{id}")
@@ -42,9 +40,9 @@ public class LoanController {
 
 
     @PostMapping("/new")
-    public ResponseEntity<String> newLoan(@RequestBody LoanDTO loanDTO) {
+    public ResponseEntity<String> createNewLoan(@RequestBody LoanDTO loanDTO) {
         try {
-            loanService.newLoan(loanDTO);
+            loanService.createNewLoan(loanDTO);
             log.info("New loan saved");
             return ResponseEntity.status(200).body("New loan saved");
         } catch (Exception e) {
@@ -78,8 +76,8 @@ public class LoanController {
     }
 
     @GetMapping("/fee/{id}/{localDate}")
-    public ResponseEntity<String> findFeeByIdTwo(@PathVariable String id,
-                                            @PathVariable String localDate) {
+    public ResponseEntity<String> calculateFee(@PathVariable String id,
+                                               @PathVariable String localDate) {
 
         if (loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)) == null) {
             return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.NO_CONTENT);

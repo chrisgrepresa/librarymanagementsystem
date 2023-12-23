@@ -1,6 +1,5 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
-import com.conanthelibrarian.librarymanagementsystem.dao.Book;
 import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.LoanMapper;
@@ -26,7 +25,7 @@ public class LoanService {
     private final BookRepository bookRepository;
 
 
-    public List<LoanDTO> findLoan(){
+    public List<LoanDTO> findAllLoan(){
         return loanRepository.findAll().stream()
                 .map(loanMapper::loanToLoanDTO)
                 .collect(Collectors.toList());
@@ -38,7 +37,7 @@ public class LoanService {
                 .findAny();
     }
 
-    public void newLoan (LoanDTO loanDTO){
+    public void createNewLoan(LoanDTO loanDTO){
         Loan loan = loanMapper.loanDTOToLoan(loanDTO);
         loanRepository.save(loan);
         log.info("Loan saved with id: {}", loanDTO.getLoanId());
@@ -57,7 +56,6 @@ public class LoanService {
     public void deleteLoanById(Integer id) {
         if(id != null){
             loanRepository.deleteById(id);
-            log.info("Loan deleted with id: {}", id);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.Book;
-import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.BookMapper;
@@ -21,29 +20,30 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
+    private final LoanService loanService;
 
 
-    public List<BookDTO> findBook(){
+    public List<BookDTO> findAllBook() {
         return bookRepository.findAll().stream()
                 .map(bookMapper::bookToBookDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<BookDTO> findBookById(Integer id){
+    public Optional<BookDTO> findBookById(Integer id) {
         return bookRepository.findById(id).stream()
                 .map(bookMapper::bookToBookDTO)
                 .findAny();
     }
 
-    public void newBook (BookDTO bookDTO){
+    public void createNewBook(BookDTO bookDTO) {
         Book book = bookMapper.bookDTOToBook(bookDTO);
         bookRepository.save(book);
         log.info("Book saved with title: {}", bookDTO.getTitle());
     }
 
-    public BookDTO modifyBook(Integer id, BookDTO bookDTO){
+    public BookDTO modifyBook(Integer id, BookDTO bookDTO) {
         Optional<Book> bookOptional = bookRepository.findById(id);
-        if(bookOptional.isPresent()){
+        if (bookOptional.isPresent()) {
             Book book = bookMapper.bookDTOToBook(bookDTO);
             bookRepository.save(book);
             log.info("Book modified with title: {}", bookDTO.getTitle());
@@ -52,60 +52,91 @@ public class BookService {
     }
 
     public void deleteBookById(Integer id) {
-        if(id != null){
+        if (id != null) {
             bookRepository.deleteById(id);
             log.info("Book deleted with id: {}", id);
         }
     }
 
-    public List<BookDTO> findBookByGenre(String genre){
+    public List<BookDTO> findBookByGenre(String genre) {
         return bookRepository.findBookByGenre(genre);
     }
 
-    public List<BookDTO> findBookInLoan(){
+    public List<BookDTO> findBookInLoan() {
         return bookRepository.findBooksInLoan();
     }
 
-
-    public void testAvailability(Integer bookId, Integer userId, LoanDTO loanDTO, BookDTO bookDTO){
+    public void openNewLoanAndReduceStockIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO){
         try{
-            findAvailableBook(bookId);
-            if(findAvailableBook(bookId).isEmpty()){
-                System.out.println("Not available");
-            } else{
+            if(isBookAvailable(bookId)){
                 System.out.println("Available");
-                //loanDTO.setUserId(userId);
-                //loanDTO.setBookId(bookId);
-                //loanService.newLoan(loanDTO);
-                //bookDTO.setAvailableCopies(500);
-                //modifyBook(bookId, bookDTO);
-                //1.modificar bookDTO
-                //2. guardar en book.Service.modifyBook(bookDTO)
-                //reduceBookQuantity(bookId, bookDTO);
+                createNewLoanIfAvailable(bookId, userId, loanDTO);
+                reduceBookQuantity(bookId);
             }
-        }catch(Exception e){
-            System.out.println("Error");
+            else{
+                System.out.println("Not available");
+            }
+        } catch(Exception e){
+            System.out.println("Error" + e.getMessage());
         }
     }
 
-    public Optional<BookDTO> findAvailableBook(Integer bookId){
-        return bookRepository.findById(bookId).stream()
+    public void deleteLoanAndIncreaseStockIfAvailable(Integer bookId, Integer userId){
+        try{
+            if(isBookAvailable(bookId)){
+                System.out.println("Available");
+                findLoanId(bookId, userId);
+                loanService.deleteLoanById(findLoanId(bookId,userId));
+                increaseBookQuantity(bookId);
+            }
+            else{
+                System.out.println("Not available");
+            }
+        } catch(Exception e){
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public boolean isBookAvailable(Integer bookId){
+        bookRepository.findById(bookId).stream()
                 .filter(book -> book.getAvailableCopies() >= 1)
                 .map(bookMapper::bookToBookDTO)
                 .findAny();
+        return true;
     }
 
-    public BookDTO reduceBookQuantity(Integer id, BookDTO bookDTO){
-        Optional<Book> bookOptional = bookRepository.findById(id);
-        if(bookOptional.isPresent()){
-            bookDTO.setAvailableCopies(500);
-            Book book = bookMapper.bookDTOToBook(bookDTO);
-            bookRepository.save(book);
-            log.info("Book quantity reduced with Id: {}", bookDTO.getBookId());
+    private void createNewLoanIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO) {
+        loanDTO.setUserId(userId);
+        loanDTO.setBookId(bookId);
+        loanService.createNewLoan(loanDTO);
+    }
+
+    public void reduceBookQuantity(Integer bookId) {
+        Optional<Book> bookOptional = bookRepository.findById(bookId);
+        if (bookOptional.isPresent()) {
+            bookOptional.get().setAvailableCopies(bookOptional.get().getAvailableCopies() - 1);
+            bookRepository.save(bookOptional.get());
+            log.info("Book modified with title: {}", bookOptional.get().getTitle());
         }
-        return bookDTO;
     }
 
+    public Integer findLoanId(Integer bookId, Integer userId) {
+        for(LoanDTO loanDTOs: loanService.findAllLoan()){
+            if(loanDTOs.getBookId().equals(bookId) && loanDTOs.getUserId().equals(userId)){
+                Integer loanId = loanDTOs.getLoanId();
+                return loanId;
+            }
+        }
+        return null;
+    }
 
+    public void increaseBookQuantity(Integer bookId) {
+        Optional<Book> bookOptional = bookRepository.findById(bookId);
+        if (bookOptional.isPresent()) {
+            bookOptional.get().setAvailableCopies(bookOptional.get().getAvailableCopies() + 1);
+            bookRepository.save(bookOptional.get());
+            log.info("Book modified with title: {}", bookOptional.get().getTitle());
+        }
+    }
 
 }

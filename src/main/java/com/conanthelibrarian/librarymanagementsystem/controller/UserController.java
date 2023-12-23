@@ -1,9 +1,7 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
-import com.conanthelibrarian.librarymanagementsystem.dao.Book;
 import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
-import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.UserService;
 import lombok.AllArgsConstructor;
@@ -25,10 +23,10 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> findAllUser() {
-        if (userService.findUser().isEmpty()) {
-            return new ResponseEntity<>(userService.findUser(), HttpStatus.NO_CONTENT);
+        if (userService.findAllUser().isEmpty()) {
+            return new ResponseEntity<>(userService.findAllUser(), HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(userService.findUser(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.findAllUser(), HttpStatus.OK);
     }
 
     @GetMapping("/find/{id}")
@@ -41,9 +39,9 @@ public class UserController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<String> newUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> createNewUser(@RequestBody UserDTO userDTO) {
         try {
-            userService.newUser(userDTO);
+            userService.createNewUser(userDTO);
             log.info("New user saved");
             return ResponseEntity.status(200).body("New user saved");
         } catch (Exception e) {
@@ -92,7 +90,7 @@ public class UserController {
 
     @GetMapping("/book/loan/{userId}")
     public List<Loan> loanPerUser(@PathVariable Integer userId){
-        return userService.loanPerUser(userId);
+        return userService.showLoanPerUser(userId);
     }
 
 }
