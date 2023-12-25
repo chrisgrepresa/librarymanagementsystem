@@ -103,6 +103,15 @@ public class BookController {
         return new ResponseEntity<>(bookService.isBookAvailable(Integer.parseInt(id)), HttpStatus.OK);
     }*/
 
+    @GetMapping("/filter/{parameter}")
+    public ResponseEntity<List<BookDTO>> filterBook (@PathVariable String parameter) {
+        if (bookService.filterBook(parameter).isEmpty()) {
+            log.info("Books not found for parameter: {}", parameter);
+            return new ResponseEntity<>(bookService.filterBook(parameter), HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(bookService.filterBook(parameter), HttpStatus.OK);
+    }
+
     @PostMapping("/new/book/{bookId}/user/{userId}")
     public ResponseEntity<String> openNewLoanIfAvailable(@PathVariable Integer bookId, @PathVariable Integer userId,
                                                          @RequestBody LoanDTO loanDTO) {
