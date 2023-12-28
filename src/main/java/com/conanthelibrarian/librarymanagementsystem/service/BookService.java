@@ -101,9 +101,9 @@ public class BookService {
                 .filter(line -> parameter.equalsIgnoreCase(line.getAuthor()) ||
                         parameter.equalsIgnoreCase(line.getTitle()) ||
                         parameter.equalsIgnoreCase(line.getGenre()))
+                .filter(line -> line.getAuthor().contains(parameter))
                 .map(bookMapper::bookToBookDTO)
                 .collect(Collectors.toList());
-
     }
 
     public boolean isBookAvailable(Integer bookId) {
