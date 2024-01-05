@@ -33,6 +33,9 @@ class BookServiceTest {
     @Mock
     LoanService loanService;
 
+    //todo versión negativa de todo: pasar la cobertura
+    //todo List of en lugar del patrón singleton, con builder
+
     @Test
     @DisplayName("Find All Books")
     public void findAllBookTest() {
@@ -60,4 +63,73 @@ class BookServiceTest {
         assertEquals("author", result.get().getAuthor());
         Mockito.verify(bookMapper).bookToBookDTO(book);
     }
+
+    @Test
+    @DisplayName("Create New Book")
+    public void createNewBookTest(){
+        Book book = new Book();
+        BookDTO bookDTO = new BookDTO(2, "title", "author", 1l, "genre", 3);
+        when(bookMapper.bookDTOToBook(any(BookDTO.class))).thenReturn(book);
+        bookService.createNewBook(bookDTO);
+        verify(bookRepository,times(1)).save(book);
+        Mockito.verify(bookMapper).bookDTOToBook(bookDTO);
+    }
+
+    @Test
+    @DisplayName("Modify Book If Optional Is Present")
+    public void modifyBookTestIfOptionalIsPresent(){
+        Book book = new Book();
+        BookDTO bookDTO = new BookDTO(2, "title", "author", 1l, "genre", 3);
+        when(bookMapper.bookDTOToBook(any(BookDTO.class))).thenReturn(book);
+        bookService.createNewBook(bookDTO);
+        verify(bookRepository,times(1)).save(book);
+        Mockito.verify(bookMapper).bookDTOToBook(bookDTO);
+    }
+
+    @Test
+    @DisplayName("Delete Book")
+    public void deleteBookTest(){
+        Integer bookId = 1;
+        bookService.deleteBookById(bookId);
+        verify(bookRepository,times(1)).deleteById(bookId);
+    }
+
+    @Test
+    @DisplayName("Find Book by Genre")
+    public void findBookByGenreTest(){
+        String stringGenre = "stringGenre";
+        List<BookDTO> bookDTOList = List.of(new BookDTO(1, "title", "author", 1l, "genre", 2));
+        when(bookRepository.findBookByGenre(stringGenre)).thenReturn(bookDTOList);
+        assertEquals("author", bookService.findBookByGenre(stringGenre).get(0).getAuthor());
+    }
+
+    @Test
+    @DisplayName("Find Book In Loan")
+    public void findBookInLoanTest(){
+        List<BookDTO> bookDTOList = List.of(new BookDTO(1, "title", "author", 1l, "genre", 2));
+        when(bookRepository.findBooksInLoan()).thenReturn(bookDTOList);
+        assertEquals("author", bookService.findBookInLoan().get(0).getAuthor());
+    }
+
+    //todo por aquí me he quedado
+
+    @Test
+    @DisplayName("Filter Book")
+    public void filterBookTest(){
+        //todo
+    }
+
+    @Test
+    @DisplayName("Open New Loan and Reduce Stock If Available")
+    public void openNewLoanAndReduceStockIfAvailableTest(){
+        //todo
+    }
+
+    @Test
+    @DisplayName("Delete Loan And Increase Stock If Available")
+    public void deleteLoanAndIncreaseStockIfAvailableTest(){
+        //todo
+    }
+
+
 }

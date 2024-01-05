@@ -59,25 +59,28 @@ public class LoanService {
 
     public String calculateFees(Integer loanId, LocalDate localDate){
         Integer days = (int)ChronoUnit.DAYS.between(findLoanById(loanId).get().getDueDate(), localDate);
-        switch ((1 <= days && days <= 5 ) ? 1 : (6 <= days && days <= 15) ? 2
-                : (16 <= days && days <= 29) ? 3 : (30 <= days) ? 4 : 5)
-        {
-            case 1:
+        switch ((1 <= days && days <= 5) ? 1 : (6 <= days && days <= 15) ? 2
+                : (16 <= days && days <= 29) ? 3 : (30 <= days) ? 4 : 5) {
+            case 1 -> {
                 log.info("First fee");
                 Double firstFee = days * 0.10;
-                return "First tranche (1-5 days late): The book is return with " + days + " days delay, your fee is: " + firstFee ;
-            case 2:
+                return "First tranche (1-5 days late): The book is return with " + days + " days delay, your fee is: " + firstFee;
+            }
+            case 2 -> {
                 log.info("Second fee");
                 Double secondFee = days * 0.25;
-                return "Second tranche (6-15 days late): The book is return with " + days + " days delay, your fee is: " + secondFee ;
-            case 3:
+                return "Second tranche (6-15 days late): The book is return with " + days + " days delay, your fee is: " + secondFee;
+            }
+            case 3 -> {
                 log.info("Third fee");
                 Double thirdFee = days * 0.50;
-                return "Third tranche (16-29 days late): The book is return with " + days + " days delay, your fee is: " + thirdFee ;
-            case 4:
+                return "Third tranche (16-29 days late): The book is return with " + days + " days delay, your fee is: " + thirdFee;
+            }
+            case 4 -> {
                 log.info("Fourth fee");
                 Double fourthFee = days * 1.0;
-                return "Fourth tranche (above 30 days late): The book is return with " + days + " days delay, your fee is: " + fourthFee ;
+                return "Fourth tranche (above 30 days late): The book is return with " + days + " days delay, your fee is: " + fourthFee;
+            }
         }
         return "This case is not possible";
         //todo esto se puede mejorar con los SOUT en una clase de Constantes.

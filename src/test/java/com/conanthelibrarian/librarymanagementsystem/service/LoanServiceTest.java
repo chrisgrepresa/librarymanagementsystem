@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LoanServiceTest {
@@ -63,6 +63,27 @@ class LoanServiceTest {
         Optional<LoanDTO> result = loanService.findLoanById(loanId);
         assertEquals(LocalDate.of(2023,12, 28), result.get().getLoanDate());
         Mockito.verify(loanMapper).loanToLoanDTO(loan);
+    }
+
+    @Test
+    @DisplayName("Create New Loan")
+    public void createNewLoanTest(){
+        Loan loan = new Loan();
+        LocalDate localDateStart = LocalDate.of(2023,12,28);
+        LocalDate localDateEnd = LocalDate.of(2023,12,30);
+        LoanDTO loanDTO = new LoanDTO(2, 1,1, localDateStart, localDateEnd);
+        when(loanMapper.loanDTOToLoan(any(LoanDTO.class))).thenReturn(loan);
+        loanService.createNewLoan(loanDTO);
+        verify(loanRepository,times(1)).save(loan);
+        Mockito.verify(loanMapper).loanDTOToLoan(loanDTO);
+    }
+
+    @Test
+    @DisplayName("Delete Loan")
+    public void deleteLoanTest(){
+        Integer loanId = 1;
+        loanService.deleteLoanById(loanId);
+        verify(loanRepository,times(1)).deleteById(loanId);
     }
 
 }

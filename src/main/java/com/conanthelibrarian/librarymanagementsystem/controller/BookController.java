@@ -20,7 +20,7 @@ import java.util.Optional;
 public class BookController {
 
     private final BookService bookService;
-    private final LoanService loanService;
+
 
     @GetMapping("/all")
     public ResponseEntity<List<BookDTO>> findAllBook() {

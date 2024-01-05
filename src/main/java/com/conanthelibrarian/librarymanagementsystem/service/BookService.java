@@ -42,14 +42,12 @@ public class BookService {
     }
 
     public BookDTO modifyBook(Integer id, BookDTO bookDTO) {
-        Optional<Book> bookOptional = bookRepository.findById(id);
-        if (bookOptional.isPresent()) {
-            Book book = bookMapper.bookDTOToBook(bookDTO);
-            bookRepository.save(book);
-            log.info("Book modified with title: {}", bookDTO.getTitle());
-        }
+        Book book = bookMapper.bookDTOToBook(bookDTO);
+        bookRepository.save(book);
+        log.info("Book modified with title: {}", bookDTO.getTitle());
         return bookDTO;
     }
+
 
     public void deleteBookById(Integer id) {
         if (id != null) {
@@ -64,6 +62,16 @@ public class BookService {
 
     public List<BookDTO> findBookInLoan() {
         return bookRepository.findBooksInLoan();
+    }
+
+    public List<BookDTO> filterBook(String parameter) {
+        return bookRepository.findAll().stream()
+                .filter(line -> parameter.equalsIgnoreCase(line.getAuthor()) ||
+                        parameter.equalsIgnoreCase(line.getTitle()) ||
+                        parameter.equalsIgnoreCase(line.getGenre()))
+                .filter(line -> line.getAuthor().contains(parameter))
+                .map(bookMapper::bookToBookDTO)
+                .collect(Collectors.toList());
     }
 
     public void openNewLoanAndReduceStockIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO) {
@@ -95,16 +103,6 @@ public class BookService {
         }
     }
 
-
-    public List<BookDTO> filterBook(String parameter) {
-        return bookRepository.findAll().stream()
-                .filter(line -> parameter.equalsIgnoreCase(line.getAuthor()) ||
-                        parameter.equalsIgnoreCase(line.getTitle()) ||
-                        parameter.equalsIgnoreCase(line.getGenre()))
-                .filter(line -> line.getAuthor().contains(parameter))
-                .map(bookMapper::bookToBookDTO)
-                .collect(Collectors.toList());
-    }
 
     public boolean isBookAvailable(Integer bookId) {
         bookRepository.findById(bookId).stream()

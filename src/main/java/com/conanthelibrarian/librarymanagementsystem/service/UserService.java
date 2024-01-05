@@ -1,10 +1,11 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
-import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dao.User;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
+import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.BookMapper;
+import com.conanthelibrarian.librarymanagementsystem.mapper.LoanMapper;
 import com.conanthelibrarian.librarymanagementsystem.mapper.UserMapper;
 import com.conanthelibrarian.librarymanagementsystem.repository.BookRepository;
 import com.conanthelibrarian.librarymanagementsystem.repository.LoanRepository;
@@ -25,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final LoanRepository loanRepository;
+    private final LoanMapper loanMapper;
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
 
@@ -68,7 +70,7 @@ public class UserService {
     }
 
     public List<BookDTO> findBookPerUser(Integer userId) {
-        for (Loan loans : showLoanPerUser(userId)) {
+        for (LoanDTO loans : showLoanPerUser(userId)) {
             List<BookDTO> listOfBooks = bookRepository.findAll().stream()
                     .filter(book -> showLoanPerUser(userId).stream()
                             .anyMatch(loan ->
@@ -84,8 +86,10 @@ public class UserService {
     }
 
 
-    public List<Loan> showLoanPerUser(Integer userId) {
-        return loanRepository.findByUserId(userId);
+    public List<LoanDTO> showLoanPerUser(Integer userId) {
+        return loanRepository.findByUserId(userId).stream()
+                .map(loanMapper::loanToLoanDTO)
+                .collect(Collectors.toList());
     }
 
 }

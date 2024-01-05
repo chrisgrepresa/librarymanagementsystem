@@ -1,10 +1,12 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
-import com.conanthelibrarian.librarymanagementsystem.dao.Book;
+
+import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dao.User;
-import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
+import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.BookMapper;
+import com.conanthelibrarian.librarymanagementsystem.mapper.LoanMapper;
 import com.conanthelibrarian.librarymanagementsystem.mapper.UserMapper;
 import com.conanthelibrarian.librarymanagementsystem.repository.BookRepository;
 import com.conanthelibrarian.librarymanagementsystem.repository.LoanRepository;
@@ -17,13 +19,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -39,6 +42,9 @@ class UserServiceTest {
 
     @Mock
     LoanRepository loanRepository;
+
+    @Mock
+    LoanMapper loanMapper;
 
     @Mock
     BookRepository bookRepository;
@@ -74,4 +80,54 @@ class UserServiceTest {
         Mockito.verify(userMapper).userToUserDTO(user);
     }
 
+    @Test
+    @DisplayName("Create New User")
+    public void createNewUserTest(){
+        User user = new User();
+        UserDTO userDTO = new UserDTO(2, "Joe", "email", "password", "role");
+        when(userMapper.userDTOToUser(any(UserDTO.class))).thenReturn(user);
+        userService.createNewUser(userDTO);
+        verify(userRepository,times(1)).save(user);
+        Mockito.verify(userMapper).userDTOToUser(userDTO);
+    }
+
+    @Test
+    @DisplayName("Delete User")
+    public void deleteUserTest(){
+        Integer userId = 1;
+        userService.deleteUserById(userId);
+        verify(userRepository,times(1)).deleteById(userId);
+    }
+
+    @Test
+    @DisplayName("Find User in Loan")
+    public void findUserInLoanTest(){
+        Integer quantity= 1;
+        List<UserDTO> userDTOList = List.of(new UserDTO(1, "name", "email", "password", "role"));
+        when(userRepository.findUserInLoanForQuantity(quantity)).thenReturn(userDTOList);
+        userService.findUserInLoan(quantity);
+        assertEquals("name", userDTOList.get(0).getName());
+    }
+
+    @Test
+    @DisplayName("Find Book Per User")
+    public void findBookPerUserTest(){
+        //todo
+    }
+
+    @Test
+    @DisplayName("Show Loan Per User")
+    public void showLoanPerUser(){
+        Integer userId = 1;
+        Loan loan = new Loan();
+        LoanDTO loanDTO = new LoanDTO();
+        LocalDate localDateStart = LocalDate.of(2023,12,28);
+        LocalDate localDateEnd = LocalDate.of(2023,12,30);
+        List<Loan> loanList = List.of(new Loan(2, 1,50, localDateStart, localDateEnd));
+        when(loanRepository.findByUserId(userId)).thenReturn(loanList);
+        when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
+        List<LoanDTO> result = userService.showLoanPerUser(userId);
+        assertEquals(1, result.size());
+        assertEquals(loanDTO, result.get(0));
+    }
 }

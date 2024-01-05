@@ -2,6 +2,7 @@ package com.conanthelibrarian.librarymanagementsystem.controller;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
+import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.UserService;
 import lombok.AllArgsConstructor;
@@ -89,7 +90,7 @@ public class UserController {
     }
 
     @GetMapping("/book/loan/{userId}")
-    public List<Loan> loanPerUser(@PathVariable Integer userId){
+    public List<LoanDTO> loanPerUser(@PathVariable Integer userId){
         return userService.showLoanPerUser(userId);
     }
 
