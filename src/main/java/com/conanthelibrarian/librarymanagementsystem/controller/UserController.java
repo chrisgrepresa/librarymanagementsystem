@@ -53,6 +53,10 @@ public class UserController {
     @PutMapping("/modify/{id}")
     public ResponseEntity<String> modifyUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
         try {
+            if (userService.findUserById(Integer.parseInt(id)).isEmpty()) {
+                log.info("User not found with ID:{}", id);
+                return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+            }
             userService.modifyUser(Integer.parseInt(id), userDTO);
             log.info("User modified");
             return ResponseEntity.status(200).body("User modified");

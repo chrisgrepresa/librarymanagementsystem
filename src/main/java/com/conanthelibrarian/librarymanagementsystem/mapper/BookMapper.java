@@ -1,9 +1,7 @@
 package com.conanthelibrarian.librarymanagementsystem.mapper;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.Book;
-import com.conanthelibrarian.librarymanagementsystem.dao.User;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
-import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import org.springframework.stereotype.Component;
 
 @Component

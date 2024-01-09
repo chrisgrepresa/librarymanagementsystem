@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
 class BookMapperTest {
@@ -17,23 +18,37 @@ class BookMapperTest {
     @InjectMocks
     BookMapper bookMapper;
 
-    //todo comprobar la cobertura
-
 
     @Test
     @DisplayName("BookDTO to Book")
-    public void bookDTOToBook(){
+    public void bookDTOToBookTest(){
         BookDTO bookDTO = new BookDTO(1, "title", "author", 1L, "genre", 3);
         Book book = bookMapper.bookDTOToBook(bookDTO);
         assertEquals("title", bookDTO.getTitle());
     }
 
     @Test
+    @DisplayName("BookDTO to Book Null")
+    public void bookDTOToBookNullTest(){
+        BookDTO bookDTO = null;
+        Book book =bookMapper.bookDTOToBook(bookDTO);
+        assertNull(book);
+    }
+
+    @Test
     @DisplayName("Book to BookDTO")
-    public void bookToBookDTO(){
+    public void bookToBookDTOTest(){
         Book book = new Book(2, "title", "author", 1L, "genre", 3);
         BookDTO bookDTO = bookMapper.bookToBookDTO(book);
         assertEquals("author", book.getAuthor());
+    }
+
+    @Test
+    @DisplayName("Book to BookDTO Null")
+    public void bookToBookDTONullTest(){
+        Book book = null;
+        BookDTO bookDTO = bookMapper.bookToBookDTO(book);
+        assertNull(bookDTO);
     }
 
 }

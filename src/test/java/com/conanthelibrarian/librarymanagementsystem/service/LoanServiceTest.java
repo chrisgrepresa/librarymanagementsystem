@@ -1,7 +1,9 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
+import com.conanthelibrarian.librarymanagementsystem.dao.Book;
 import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dao.User;
+import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.LoanMapper;
@@ -74,6 +76,21 @@ class LoanServiceTest {
         LoanDTO loanDTO = new LoanDTO(2, 1,1, localDateStart, localDateEnd);
         when(loanMapper.loanDTOToLoan(any(LoanDTO.class))).thenReturn(loan);
         loanService.createNewLoan(loanDTO);
+        verify(loanRepository,times(1)).save(loan);
+        Mockito.verify(loanMapper).loanDTOToLoan(loanDTO);
+    }
+
+    //todo CORREGIR:
+    @Test
+    @DisplayName("Modify Loan If Optional Is Present")
+    public void modifyLoanTest(){
+        Integer id= 1;
+        Loan loan = new Loan();
+        LocalDate localDateStart = LocalDate.of(2023,12,28);
+        LocalDate localDateEnd = LocalDate.of(2023,12,30);
+        LoanDTO loanDTO = new LoanDTO(2, 1,1, localDateStart, localDateEnd);
+        when(loanMapper.loanDTOToLoan(any(LoanDTO.class))).thenReturn(loan);
+        loanService.modifyLoan(id,loanDTO);
         verify(loanRepository,times(1)).save(loan);
         Mockito.verify(loanMapper).loanDTOToLoan(loanDTO);
     }

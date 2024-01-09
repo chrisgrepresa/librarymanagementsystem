@@ -80,11 +80,12 @@ class BookServiceTest {
 
     @Test
     @DisplayName("Modify Book If Optional Is Present")
-    public void modifyBookTestIfOptionalIsPresent(){
+    public void modifyBookTest(){
+        Integer id= 1;
         Book book = new Book();
         BookDTO bookDTO = new BookDTO(2, "title", "author", 1l, "genre", 3);
         when(bookMapper.bookDTOToBook(any(BookDTO.class))).thenReturn(book);
-        bookService.createNewBook(bookDTO);
+        bookService.modifyBook(id, bookDTO);
         verify(bookRepository,times(1)).save(book);
         Mockito.verify(bookMapper).bookDTOToBook(bookDTO);
     }

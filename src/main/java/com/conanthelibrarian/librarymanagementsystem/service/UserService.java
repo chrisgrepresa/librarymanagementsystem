@@ -49,13 +49,13 @@ public class UserService {
     }
 
     public UserDTO modifyUser(Integer id, UserDTO userDTO) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isPresent()) {
+        if(findUserById(id).isPresent()){
             User user = userMapper.userDTOToUser(userDTO);
             userRepository.save(user);
             log.info("User modified with name: {}", userDTO.getName());
+            return userDTO;
         }
-        return userDTO;
+        return null;
     }
 
     public void deleteUserById(Integer id) {

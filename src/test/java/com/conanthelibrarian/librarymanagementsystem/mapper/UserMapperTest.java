@@ -18,18 +18,34 @@ class UserMapperTest {
 
     @Test
     @DisplayName("UserDTO To User")
-    public void userDTOToUser(){
+    public void userDTOToUserTest(){
         UserDTO userDTO = new UserDTO(2, "Joe", "email", "password", "role");
         User user = userMapper.userDTOToUser(userDTO);
         assertEquals("Joe", userDTO.getName());
     }
 
     @Test
+    @DisplayName("UserDTO To User Null")
+    public void userDTOToUserNullTest(){
+        UserDTO userDTO = null;
+        User user = userMapper.userDTOToUser(userDTO);
+        assertNull(user);
+    }
+
+    @Test
     @DisplayName("User To UserDTO")
-    public void userToUserDTO(){
+    public void userToUserDTOTest(){
         User user = new User(2, "Joe", "email", "password", "role");
         UserDTO userDTO = userMapper.userToUserDTO(user);
         assertEquals("Joe", user.getName());
+    }
+
+    @Test
+    @DisplayName("User To UserDTO Null")
+    public void userToUserDTONullTest(){
+        User user = null;
+        UserDTO userDTO = userMapper.userToUserDTO(user);
+        assertNull(userDTO);
     }
 
 }

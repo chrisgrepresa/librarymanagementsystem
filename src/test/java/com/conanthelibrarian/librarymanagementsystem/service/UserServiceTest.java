@@ -1,8 +1,10 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
 
+import com.conanthelibrarian.librarymanagementsystem.dao.Book;
 import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dao.User;
+import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.BookMapper;
@@ -91,6 +93,19 @@ class UserServiceTest {
         Mockito.verify(userMapper).userDTOToUser(userDTO);
     }
 
+    @Test
+    @DisplayName("Modify User")
+    public void modifyUserTest(){
+        Integer id= 1;
+        User user = new User();
+        UserDTO userDTO = new UserDTO(2, "Joe", "email", "password", "role");
+        when(userMapper.userDTOToUser(any(UserDTO.class))).thenReturn(user);
+        userService.modifyUser(id, userDTO);
+        verify(userRepository,times(1)).save(user);
+        Mockito.verify(userMapper).userDTOToUser(userDTO);
+    }
+
+//todo ver otras posibles opciones con Modify
     @Test
     @DisplayName("Delete User")
     public void deleteUserTest(){

@@ -42,12 +42,9 @@ public class LoanService {
     }
 
     public LoanDTO modifyLoan(Integer id, LoanDTO loanDTO){
-        Optional<Loan> loanOptional = loanRepository.findById(id);
-        if(loanOptional.isPresent()){
-            Loan loan = loanMapper.loanDTOToLoan(loanDTO);
-            loanRepository.save(loan);
-            log.info("Loan modified with id: {}", loanDTO.getLoanId());
-        }
+        Loan loan = loanMapper.loanDTOToLoan(loanDTO);
+        loanRepository.save(loan);
+        log.info("Loan modified with id: {}", loanDTO.getLoanId());
         return loanDTO;
     }
 
