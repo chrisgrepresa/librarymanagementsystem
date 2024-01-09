@@ -1,6 +1,5 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
-import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
@@ -55,8 +54,8 @@ public class UserController {
     public ResponseEntity<String> modifyUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
         try {
             userService.modifyUser(Integer.parseInt(id), userDTO);
-            log.info("New user modified");
-            return ResponseEntity.status(200).body("New user modified");
+            log.info("User modified");
+            return ResponseEntity.status(200).body("User modified");
         } catch (Exception e) {
             log.info("Error when saving user: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving user:" + e.getMessage());

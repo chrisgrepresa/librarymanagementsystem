@@ -1,7 +1,9 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.Book;
+import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
+import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.BookMapper;
 import com.conanthelibrarian.librarymanagementsystem.repository.BookRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,10 +116,20 @@ class BookServiceTest {
 
     //todo por aquí me he quedado
 
+
+    //todo  CORREGIR!
     @Test
     @DisplayName("Filter Book")
     public void filterBookTest(){
-        //todo
+        String parameter = "parameter";
+        Book book = new Book();
+        BookDTO bookDTO = new BookDTO();
+        List<Book> bookList = List.of(new Book(71, "title", "author", 1l, "genre", 2));
+        when(bookRepository.findAll()).thenReturn(bookList);
+        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
+        List<BookDTO> result = bookService.filterBook(parameter);
+        assertEquals("author", bookService.filterBook(parameter).get(0).getAuthor());
+        Mockito.verify(bookMapper).bookToBookDTO(book);
     }
 
     @Test
@@ -129,6 +142,43 @@ class BookServiceTest {
     @DisplayName("Delete Loan And Increase Stock If Available")
     public void deleteLoanAndIncreaseStockIfAvailableTest(){
         //todo
+    }
+
+    @Test
+    @DisplayName("Is Book Available")
+    public void isBookAvailableTest(){
+        Integer bookId = 1;
+        assertTrue(bookService.isBookAvailable(bookId));
+    }
+
+    @Test
+    @DisplayName("Create New Loan If Available")
+    public void createNewLoanIfAvailableTest(){
+        //todo
+    }
+
+    @Test
+    @DisplayName("Reduce Book Quantity")
+    public void reduceBookQuantityTest(){
+        /*Integer bookId = 1;
+        Book book = new Book();
+        BookDTO bookDTO = new BookDTO(2, "title", "author", 1l, "genre", 3);
+        Optional<Book> bookOptional = Optional.of(book);
+        when(bookRepository.findById(bookId)).thenReturn(bookOptional);
+        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
+        Optional<BookDTO> result = bookService.findBookById(bookId);
+        bookService.reduceBookQuantity(bookId);
+        assertTrue(result.isPresent());*/
+
+        /*Integer bookId = 1;
+        Book book = new Book();
+        BookDTO bookDTO = new BookDTO(2, "title", "author", 1l, "genre", 3);
+        Optional<Book> bookOptional = Optional.of(book);
+        when(bookRepository.findById(bookId)).thenReturn(bookOptional);
+        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
+        bookService.reduceBookQuantity(bookId);
+        assertEquals("author", bookOptional.get().getAuthor());
+        Mockito.verify(bookMapper).bookToBookDTO(book);*/
     }
 
 

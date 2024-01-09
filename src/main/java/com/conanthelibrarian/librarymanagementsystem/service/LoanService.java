@@ -64,26 +64,25 @@ public class LoanService {
             case 1 -> {
                 log.info("First fee");
                 Double firstFee = days * 0.10;
-                return "First tranche (1-5 days late): The book is return with " + days + " days delay, your fee is: " + firstFee;
+                return Constants.FEE_FIRST_TRANCHE + days + Constants.DELAY_DAYS_RESULT + firstFee;
             }
             case 2 -> {
                 log.info("Second fee");
                 Double secondFee = days * 0.25;
-                return "Second tranche (6-15 days late): The book is return with " + days + " days delay, your fee is: " + secondFee;
+                return Constants.FEE_SECOND_TRANCHE + days + Constants.DELAY_DAYS_RESULT + secondFee;
             }
             case 3 -> {
                 log.info("Third fee");
                 Double thirdFee = days * 0.50;
-                return "Third tranche (16-29 days late): The book is return with " + days + " days delay, your fee is: " + thirdFee;
+                return Constants.FEE_THIRD_TRANCHE + days + Constants.DELAY_DAYS_RESULT + thirdFee;
             }
             case 4 -> {
                 log.info("Fourth fee");
                 Double fourthFee = days * 1.0;
-                return "Fourth tranche (above 30 days late): The book is return with " + days + " days delay, your fee is: " + fourthFee;
+                return Constants.FEE_FOURTH_TRANCHE + days + Constants.DELAY_DAYS_RESULT + fourthFee;
             }
         }
-        return "This case is not possible";
-        //todo esto se puede mejorar con los SOUT en una clase de Constantes.
+        return Constants.RESULT_IMPOSSIBLE;
     }
 
 }
