@@ -48,14 +48,18 @@ public class UserService {
         log.info("User saved with name: {}", userDTO.getName());
     }
 
-    public UserDTO modifyUser(Integer id, UserDTO userDTO) {
-        if(findUserById(id).isPresent()){
+    //todo a Modify le he cambiado devolver un UserDTO por devolver un void
+    public void modifyUser(Integer id, UserDTO userDTO) {
+        User user = userMapper.userDTOToUser(userDTO);
+        userRepository.save(user);
+        log.info("User modified with name: {}", userDTO.getName());
+        /*if(findUserById(id).isPresent()){
             User user = userMapper.userDTOToUser(userDTO);
             userRepository.save(user);
             log.info("User modified with name: {}", userDTO.getName());
-            return userDTO;
+            //return userDTO;
         }
-        return null;
+        //return null;*/
     }
 
     public void deleteUserById(Integer id) {

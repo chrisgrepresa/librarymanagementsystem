@@ -57,9 +57,11 @@ public class UserController {
                 log.info("User not found with ID:{}", id);
                 return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
             }
-            userService.modifyUser(Integer.parseInt(id), userDTO);
-            log.info("User modified");
-            return ResponseEntity.status(200).body("User modified");
+            else{
+                userService.modifyUser(Integer.parseInt(id), userDTO);
+                log.info("User modified");
+                return ResponseEntity.status(200).body("User modified");
+            }
         } catch (Exception e) {
             log.info("Error when saving user: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving user:" + e.getMessage());
@@ -88,13 +90,21 @@ public class UserController {
     }
 
     @GetMapping("/book/{userId}")
-    public List<BookDTO> bookPerUser(@PathVariable String userId, Integer loanId){
-        return userService.findBookPerUser(Integer.parseInt(userId));
+    public ResponseEntity<List<BookDTO>> bookPerUser(@PathVariable String userId, Integer loanId){
+        if(userService.findBookPerUser(Integer.parseInt(userId)).isEmpty()){
+            log.info("Not book found for user with id: {}", userId);
+            return new ResponseEntity<>(userService.findBookPerUser(Integer.parseInt(userId)), HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(userService.findBookPerUser(Integer.parseInt(userId)), HttpStatus.OK);
     }
 
     @GetMapping("/book/loan/{userId}")
-    public List<LoanDTO> loanPerUser(@PathVariable Integer userId){
-        return userService.showLoanPerUser(userId);
+    public ResponseEntity<List<LoanDTO>> loanPerUser(@PathVariable String userId){
+        if(userService.showLoanPerUser(Integer.parseInt(userId)).isEmpty()){
+            log.info("Not loan found for user with id: {}", Integer.parseInt(userId));
+            return new ResponseEntity<>(userService.showLoanPerUser(Integer.parseInt(userId)), HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(userService.showLoanPerUser(Integer.parseInt(userId)), HttpStatus.OK);
     }
 
 }

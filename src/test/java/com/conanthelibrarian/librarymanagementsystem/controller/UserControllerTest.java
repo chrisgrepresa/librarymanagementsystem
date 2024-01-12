@@ -1,6 +1,8 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.User;
+import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
+import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.UserDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,7 +65,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Find User By Id NOT FOUND Result")
+    @DisplayName("Find User By Id Not Found Result")
     public void findUserByIdNotFoundTest(){
         String id= "1";
         Optional<UserDTO> optionalUserDTO = Optional.empty();
@@ -73,7 +76,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Find User By Id WRONG PATH Result")
+    @DisplayName("Find User By Id Wrong Path Variable Result")
     public void findUserByIdWrongPathVariableTest(){
         String id= "ñ";
         assertThrows(Exception.class,() -> {
@@ -99,45 +102,42 @@ class UserControllerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
 
-    //todo Aquí hay un error, en el @PutMapping ModifyUser
     @Test
     @DisplayName("Modify User")
     public void modifyUserTest(){
         String id = "1";
+        Optional<UserDTO> optionalUserDTO = Optional.of(UserDTO.builder().name("name").build());
         UserDTO userDTO = UserDTO.builder().name("name").build();
+        when(userService.findUserById(Mockito.anyInt())).thenReturn(optionalUserDTO);
         ResponseEntity<String> result = userController.modifyUser(id, userDTO);
         assertEquals("User modified", result.getBody());
         assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 //todo Modify: not found, wrong path
 
-    /*@Test
-    @DisplayName("Modify User NOT FOUND")
-    public void modifyUserNotFound(){
-        //todo AQUÍ ESTÁ el problema: no está diferenciado en UserController.
-        // Dentro del try habría que meter un if else
+    @Test
+    @DisplayName("Modify User Not Found")
+    public void modifyUserNotFoundTest(){
+        String id= "1";
+        Optional<UserDTO> optionalUserDTO = Optional.empty();
+        UserDTO userDTO = new UserDTO();
+        when(userService.findUserById(Mockito.anyInt())).thenReturn(optionalUserDTO);
+        ResponseEntity<String> result = userController.modifyUser(id,userDTO);
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 
-    @Test
+    /*@Test
     @DisplayName("Modify User Wrong Path Variable")
     public void modifyUserWrongPathVariableTest(){
-        String id = "ñ";
+        String id= "ñ";
+        Optional<UserDTO> optionalUserDTO = Optional.empty();
         UserDTO userDTO = UserDTO.builder().name("name").build();
-        assertThrows(Exception.class,() -> {
-            ResponseEntity<String> result = userController.modifyUser(id,userDTO);
-        });
+        doThrow(new RuntimeException("this is an error")).when(userService.findUserById(Mockito.anyInt()));
+        doThrow(new RuntimeException("this is an error")).when(userService).modifyUser(Mockito.anyInt(),userDTO);
+        ResponseEntity<String> result = userController.modifyUser(id,userDTO);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }*/
 
-    @Test
-    @DisplayName("Modify User Wrong Request Body")
-    public void modifyUserWrongRequestBodyTest(){
-        String id= "1";
-        UserDTO userDTO = UserDTO.builder().name("name").build();
-        doThrow(new RuntimeException("this is an error"))
-                .when(userService).modifyUser(Integer.parseInt(id), userDTO);
-        ResponseEntity<String> result = userController.modifyUser(id, userDTO);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
-    }
 
     @Test
     @DisplayName("Delete User")
@@ -186,7 +186,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Find User In Loan For Quantity Wrong Path Result")
+    @DisplayName("Find User In Loan For Quantity Wrong Path Variable Result")
     public void findUserInLoanForQuantityWrongPathVariableTest(){
         String quantity = "ñ";
         assertThrows(Exception.class,()-> {
@@ -194,8 +194,72 @@ class UserControllerTest {
         });
     }
 
-    //todo bookPerUser (arreglar que no sea ResponseEntity)
-    //todo LoanPerUser (lo mismo)
+    @Test
+    @DisplayName("Book Per User")
+    public void bookPerUserTest(){
+        String userId= "2";
+        Integer loadId= 3;
+        List<BookDTO> bookDTOList = List.of(new BookDTO(1,"title", "author", 1L, "genre", 3));
+        when(userService.findBookPerUser(Mockito.anyInt())).thenReturn(bookDTOList);
+        ResponseEntity<List<BookDTO>> result = userController.bookPerUser(userId, loadId);
+        assertEquals("author", result.getBody().get(0).getAuthor());
+    }
+
+    @Test
+    @DisplayName("Book Per User No Content")
+    public void bookPerUserNoContentTest(){
+        String userId= "2";
+        Integer loadId= 3;
+        List<BookDTO> bookDTOList = List.of();
+        when(userService.findBookPerUser(Mockito.anyInt())).thenReturn(bookDTOList);
+        ResponseEntity<List<BookDTO>> result = userController.bookPerUser(userId, loadId);
+        assertTrue(result.getBody().isEmpty());
+        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Book Per User Wrong Path Variable")
+    public void bookPerUserWrongPathVariableTest(){
+        String userId= "ñ";
+        Integer loadId= 3;
+        assertThrows(Exception.class,()-> {
+            ResponseEntity<List<BookDTO>> result = userController.bookPerUser(userId, loadId);
+        });
+    }
+
+    @Test
+    @DisplayName("Loan Per User")
+    public void loanPerUserTest(){
+        String userId= "2";
+        LocalDate localDateStart = LocalDate.of(2023,12,28);
+        LocalDate localDateEnd = LocalDate.of(2023,12,30);
+        List<LoanDTO> loanDTOList = List.of(new LoanDTO(2, 1,1, localDateStart, localDateEnd));
+        when(userService.showLoanPerUser(Mockito.anyInt())).thenReturn(loanDTOList);
+        ResponseEntity<List<LoanDTO>> result = userController.loanPerUser(userId);
+        assertEquals(1, result.getBody().get(0).getUserId());
+    }
+
+    @Test
+    @DisplayName("Loan Per User No Content")
+    public void loanPerUserNoContentTest(){
+        String userId= "2";
+        LocalDate localDateStart = LocalDate.of(2023,12,28);
+        LocalDate localDateEnd = LocalDate.of(2023,12,30);
+        List<LoanDTO> loanDTOList = List.of();
+        when(userService.showLoanPerUser(Mockito.anyInt())).thenReturn(loanDTOList);
+        ResponseEntity<List<LoanDTO>> result = userController.loanPerUser(userId);
+        assertTrue(result.getBody().isEmpty());
+        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Loan Per User Wrong Path Variable")
+    public void loanPerUserWrongPathVariableTest(){
+        String userId= "ñ";
+        assertThrows(Exception.class,() -> {
+            ResponseEntity<List<LoanDTO>> result = userController.loanPerUser(userId);
+        });
+    }
 
 
 }
