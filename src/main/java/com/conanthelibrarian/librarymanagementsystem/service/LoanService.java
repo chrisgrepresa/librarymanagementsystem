@@ -41,14 +41,13 @@ public class LoanService {
         log.info("Loan saved with id: {}", loanDTO.getLoanId());
     }
 
-    public LoanDTO modifyLoan(Integer id, LoanDTO loanDTO){
+    public void modifyLoan(Integer id, LoanDTO loanDTO){
         Loan loan = loanMapper.loanDTOToLoan(loanDTO);
         loanRepository.save(loan);
         log.info("Loan modified with id: {}", loanDTO.getLoanId());
-        return loanDTO;
     }
 
-    public void deleteLoanById(Integer id) {
+    public void deleteLoanById(Integer id){
         if(id != null){
             loanRepository.deleteById(id);
         }
@@ -57,7 +56,7 @@ public class LoanService {
     public String calculateFees(Integer loanId, LocalDate localDate){
         Integer days = (int)ChronoUnit.DAYS.between(findLoanById(loanId).get().getDueDate(), localDate);
         switch ((1 <= days && days <= 5) ? 1 : (6 <= days && days <= 15) ? 2
-                : (16 <= days && days <= 29) ? 3 : (30 <= days) ? 4 : 5) {
+                : (16 <= days && days <= 29) ? 3 : (30 <= days) ? 4 : 5){
             case 1 -> {
                 log.info("First fee");
                 Double firstFee = days * 0.10;

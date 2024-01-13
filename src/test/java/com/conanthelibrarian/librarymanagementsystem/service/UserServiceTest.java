@@ -20,6 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -127,22 +129,75 @@ class UserServiceTest {
     @Test
     @DisplayName("Find Book Per User")
     public void findBookPerUserTest(){
-        //todo
+        Integer userId = 1;
+        BookDTO bookDTO = new BookDTO();
+        List<Book> bookList =
+                List.of(new Book(71, "title", "author", 1l, "genre", 2));
+        when(bookRepository.findAll()).thenReturn(bookList);
+        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
+        List<BookDTO> result = userService.findBookPerUser(userId);
+        assertEquals(1, result.size());
     }
+    /*@Test
+    @DisplayName("Find Book Per User")
+    public void findBookPerUserTest(){
+        //todo
+        Integer userId= 1;
+        LocalDate localDateStart = LocalDate.of(2023,12,28);
+        LocalDate localDateEnd = LocalDate.of(2023,12,30);
+        Loan loan = new Loan(2, 1,50, localDateStart, localDateEnd);
+        LoanDTO loanDTO = new LoanDTO(2, 1,50, localDateStart, localDateEnd);
+        List<Loan> loanList = List.of(new Loan(2, 1,50, localDateStart, localDateEnd));
+        List<LoanDTO> loanDTOList = List.of(new LoanDTO(2, 1,50, localDateStart, localDateEnd));
+
+        BookDTO bookDTO = new BookDTO(71, "title", "author", 1l, "genre", 2);
+        List<Book> bookList = List.of(new Book(71, "title", "author", 1l, "genre", 2));
+
+        when(userService.findLoanPerUser(userId)).thenReturn(loanDTOList);
+        when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
+
+        when(bookRepository.findAll()).thenReturn(bookList);
+        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
+        List<BookDTO> result = userService.findBookPerUser(userId);
+        assertEquals("author", result.get(0).getAuthor());
+        //assertEquals(1, result.size());
+        //assertEquals(bookDTO, result.get(0));
+    }*/
 
     @Test
-    @DisplayName("Show Loan Per User")
-    public void showLoanPerUser(){
+    @DisplayName("Find Loan Per User")
+    public void findLoanPerUserTest(){
         Integer userId = 1;
-        Loan loan = new Loan();
         LoanDTO loanDTO = new LoanDTO();
         LocalDate localDateStart = LocalDate.of(2023,12,28);
         LocalDate localDateEnd = LocalDate.of(2023,12,30);
         List<Loan> loanList = List.of(new Loan(2, 1,50, localDateStart, localDateEnd));
         when(loanRepository.findByUserId(userId)).thenReturn(loanList);
         when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
-        List<LoanDTO> result = userService.showLoanPerUser(userId);
+        List<LoanDTO> result = userService.findLoanPerUser(userId);
         assertEquals(1, result.size());
         assertEquals(loanDTO, result.get(0));
+    }
+
+    @Test
+    @DisplayName("Find Loan Per User")
+    public void findLoanPerUserNotFoundTest(){
+        Integer userId = 1;
+        List<Loan> loanList = List.of();
+        when(loanRepository.findByUserId(userId)).thenReturn(loanList);
+        List<LoanDTO> result = userService.findLoanPerUser(userId);
+        assertTrue(userService.findLoanPerUser(userId).isEmpty());
+    }
+
+    @Test
+    @DisplayName("Find Loan Per User Wrong Path Variable")
+    public void findLoanPerUserWrongPathVariableTest(){
+        String userId= "ñ";
+        LocalDate localDateStart = LocalDate.of(2023,12,28);
+        LocalDate localDateEnd = LocalDate.of(2023,12,30);
+        List<Loan> loanList = List.of(new Loan(2, 1,50, localDateStart, localDateEnd));
+        assertThrows(Exception.class,()-> {
+            List<LoanDTO> result = userService.findLoanPerUser(Integer.parseInt(userId));
+        });
     }
 }

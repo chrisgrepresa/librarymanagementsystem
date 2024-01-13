@@ -23,48 +23,47 @@ public class BookService {
     private final LoanService loanService;
 
 
-    public List<BookDTO> findAllBook() {
+    public List<BookDTO> findAllBook(){
         return bookRepository.findAll().stream()
                 .map(bookMapper::bookToBookDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<BookDTO> findBookById(Integer id) {
+    public Optional<BookDTO> findBookById(Integer id){
         return bookRepository.findById(id).stream()
                 .map(bookMapper::bookToBookDTO)
                 .findAny();
     }
 
-    public void createNewBook(BookDTO bookDTO) {
+    public void createNewBook(BookDTO bookDTO){
         Book book = bookMapper.bookDTOToBook(bookDTO);
         bookRepository.save(book);
         log.info("Book saved with title: {}", bookDTO.getTitle());
     }
 
-    public BookDTO modifyBook(Integer id, BookDTO bookDTO) {
+    public void modifyBook(Integer id, BookDTO bookDTO){
         Book book = bookMapper.bookDTOToBook(bookDTO);
         bookRepository.save(book);
         log.info("Book modified with title: {}", bookDTO.getTitle());
-        return bookDTO;
     }
 
 
-    public void deleteBookById(Integer id) {
-        if (id != null) {
+    public void deleteBookById(Integer id){
+        if(id != null){
             bookRepository.deleteById(id);
             log.info("Book deleted with id: {}", id);
         }
     }
 
-    public List<BookDTO> findBookByGenre(String genre) {
+    public List<BookDTO> findBookByGenre(String genre){
         return bookRepository.findBookByGenre(genre);
     }
 
-    public List<BookDTO> findBookInLoan() {
+    public List<BookDTO> findBookInLoan(){
         return bookRepository.findBooksInLoan();
     }
 
-    public List<BookDTO> filterBook(String parameter) {
+    public List<BookDTO> filterBook(String parameter){
         return bookRepository.findAll().stream()
                 .filter(line -> parameter.equalsIgnoreCase(line.getAuthor()) ||
                         parameter.equalsIgnoreCase(line.getTitle()) ||
@@ -74,37 +73,39 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    public void openNewLoanAndReduceStockIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO) {
+    public void openNewLoanAndReduceStockIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO){
         try {
-            if (isBookAvailable(bookId)) {
+            if(isBookAvailable(bookId)){
                 System.out.println("Available");
                 createNewLoanIfAvailable(bookId, userId, loanDTO);
-                reduceBookQuantity(bookId);
-            } else {
+                reduceAvailableStock(bookId);
+            }
+            else{
                 System.out.println("Not available");
             }
-        } catch (Exception e) {
+        } catch (Exception e){
             System.out.println("Error" + e.getMessage());
         }
     }
 
-    public void deleteLoanAndIncreaseStockIfAvailable(Integer bookId, Integer userId) {
+    public void deleteLoanAndIncreaseStockIfAvailable(Integer bookId, Integer userId){
         try {
-            if (isBookAvailable(bookId)) {
+            if(isBookAvailable(bookId)){
                 System.out.println("Available");
                 findLoanId(bookId, userId);
                 loanService.deleteLoanById(findLoanId(bookId, userId));
-                increaseBookQuantity(bookId);
-            } else {
+                increaseAvailableStock(bookId);
+            }
+            else{
                 System.out.println("Not available");
             }
-        } catch (Exception e) {
+        } catch (Exception e){
             System.out.println("Error: " + e.getMessage());
         }
     }
 
 
-    public boolean isBookAvailable(Integer bookId) {
+    public boolean isBookAvailable(Integer bookId){
         bookRepository.findById(bookId).stream()
                 .filter(book -> book.getAvailableCopies() >= 1)
                 .map(bookMapper::bookToBookDTO)
@@ -112,24 +113,24 @@ public class BookService {
         return true;
     }
 
-    private void createNewLoanIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO) {
+    private void createNewLoanIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO){
         loanDTO.setUserId(userId);
         loanDTO.setBookId(bookId);
         loanService.createNewLoan(loanDTO);
     }
 
-    public void reduceBookQuantity(Integer bookId) {
+    public void reduceAvailableStock(Integer bookId){
         Optional<Book> bookOptional = bookRepository.findById(bookId);
-        if (bookOptional.isPresent()) {
+        if(bookOptional.isPresent()){
             bookOptional.get().setAvailableCopies(bookOptional.get().getAvailableCopies() - 1);
             bookRepository.save(bookOptional.get());
             log.info("Book modified with title: {}", bookOptional.get().getTitle());
         }
     }
 
-    public Integer findLoanId(Integer bookId, Integer userId) {
-        for (LoanDTO loanDTOs : loanService.findAllLoan()) {
-            if (loanDTOs.getBookId().equals(bookId) && loanDTOs.getUserId().equals(userId)) {
+    public Integer findLoanId(Integer bookId, Integer userId){
+        for (LoanDTO loanDTOs : loanService.findAllLoan()){
+            if(loanDTOs.getBookId().equals(bookId) && loanDTOs.getUserId().equals(userId)){
                 Integer loanId = loanDTOs.getLoanId();
                 return loanId;
             }
@@ -137,13 +138,12 @@ public class BookService {
         return null;
     }
 
-    public void increaseBookQuantity(Integer bookId) {
+    public void increaseAvailableStock(Integer bookId){
         Optional<Book> bookOptional = bookRepository.findById(bookId);
-        if (bookOptional.isPresent()) {
+        if(bookOptional.isPresent()){
             bookOptional.get().setAvailableCopies(bookOptional.get().getAvailableCopies() + 1);
             bookRepository.save(bookOptional.get());
             log.info("Book modified with title: {}", bookOptional.get().getTitle());
         }
     }
-
 }

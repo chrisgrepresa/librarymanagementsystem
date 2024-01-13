@@ -41,7 +41,7 @@ class LoanControllerTest {
     }
 
     @Test
-    @DisplayName("Find All Loan NO CONTENT Result")
+    @DisplayName("Find All Loan No Content Result")
     public void findAllLoanNoContentTest(){
         List<LoanDTO> loanDTOList = List.of();
         when(loanService.findAllLoan()).thenReturn(loanDTOList);
@@ -60,7 +60,7 @@ class LoanControllerTest {
     }
 
     @Test
-    @DisplayName("Find Loan By Id NOT FOUND Result")
+    @DisplayName("Find Loan By Id No Found Result")
     public void findLoanByIdNotFoundTest(){
         String id= "1";
         Optional<LoanDTO> optionalLoanDTO = Optional.empty();
@@ -71,7 +71,7 @@ class LoanControllerTest {
     }
 
     @Test
-    @DisplayName("Find Loan By Id WRONG PATH Result")
+    @DisplayName("Find Loan By Id Wrong Path Variable Result")
     public void findLoanByIdWrongPathVariableTest(){
         String id= "ñ";
         assertThrows(Exception.class,() -> {
@@ -89,16 +89,64 @@ class LoanControllerTest {
     }
 
     @Test
-    @DisplayName("Create New Loan Wrong Body Request")
-    public void createNewLoanWrongBodyRequestTest(){
+    @DisplayName("Create New Loan Internal Server Error")
+    public void createNewLoanInternalServerErrorTest(){
         LoanDTO loanDTO = LoanDTO.builder().userId(1).build();
         doThrow(new RuntimeException("this is an error")).when(loanService).createNewLoan(loanDTO);
         ResponseEntity<String> result = loanController.createNewLoan(loanDTO);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
-    //todo Modify
 
-    //todo Delete
+    @Test
+    @DisplayName("Modify Loan")
+    public void modifyLoanTest(){
+        String id = "1";
+        Optional<LoanDTO> optionalLoanDTO = Optional.of(LoanDTO.builder().userId(1).build());
+        LoanDTO loanDTO = LoanDTO.builder().userId(1).build();
+        when(loanService.findLoanById(Mockito.anyInt())).thenReturn(optionalLoanDTO);
+        ResponseEntity<String> result = loanController.modifyLoan(id, loanDTO);
+        assertEquals("Loan modified", result.getBody());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Modify Loan Not Found")
+    public void modifyLoanNotFoundTest(){
+        String id= "1";
+        Optional<LoanDTO> optionalLoanDTO = Optional.empty();
+        LoanDTO loanDTO = new LoanDTO();
+        when(loanService.findLoanById(Mockito.anyInt())).thenReturn(optionalLoanDTO);
+        ResponseEntity<String> result = loanController.modifyLoan(id,loanDTO);
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Modify Loan Internal Server Error")
+    public void modifyLoanInternalServerErrorTest(){
+        String id= "ñ";
+        LoanDTO loanDTO = LoanDTO.builder().userId(1).build();
+        ResponseEntity<String> result = loanController.modifyLoan(id,loanDTO);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Delete Loan")
+    public void deleteLoanTest(){
+        String id= "1";
+        LoanDTO loanDTO = LoanDTO.builder().userId(1).build();
+        ResponseEntity<String> result = loanController.deleteLoan(id);
+        assertEquals("Loan deleted", result.getBody());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Delete Loan Internal Server Error")
+    public void deleteLoanInternalServerErrorTest(){
+        String id= "ñ";
+        LoanDTO loanDTO = LoanDTO.builder().userId(1).build();
+        ResponseEntity<String> result = loanController.deleteLoan(id);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+    }
 
     @Test
     @DisplayName("Calculate Fee")
@@ -112,4 +160,15 @@ class LoanControllerTest {
         assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 
+    @Test
+    @DisplayName("Calculate Fee No Content")
+    public void calculateFeeNoContentTest(){
+        String id= "1";
+        String localDate= "2023-12-10";
+        String fee = null;
+        LoanDTO loanDTO = LoanDTO.builder().userId(1).build();
+        when(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate))).thenReturn(fee);
+        ResponseEntity<String> result = loanController.calculateFee(id,localDate);
+        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
+    }
 }

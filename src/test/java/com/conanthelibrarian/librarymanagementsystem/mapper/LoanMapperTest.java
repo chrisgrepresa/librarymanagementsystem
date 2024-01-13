@@ -18,7 +18,6 @@ class LoanMapperTest {
     @InjectMocks
     LoanMapper loanMapper;
 
-
     @Test
     @DisplayName("LoanDTO to Loan")
     public void loanDTOToLoanTest(){
@@ -28,7 +27,6 @@ class LoanMapperTest {
         Loan loan = loanMapper.loanDTOToLoan(loanDTO);
         assertEquals(1, loanDTO.getBookId());
     }
-
     @Test
     @DisplayName("LoanDTO to Loan Null")
     public void loanDTOToLoanNullTest(){

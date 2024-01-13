@@ -20,18 +20,17 @@ public class LoanController {
 
     private final LoanService loanService;
 
-
     @GetMapping("/all")
-    public ResponseEntity<List<LoanDTO>> findAllLoan() {
-        if (loanService.findAllLoan().isEmpty()) {
+    public ResponseEntity<List<LoanDTO>> findAllLoan(){
+        if(loanService.findAllLoan().isEmpty()){
             return new ResponseEntity<>(loanService.findAllLoan(), HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(loanService.findAllLoan(), HttpStatus.OK);
     }
 
     @GetMapping("/find/{id}")
-    public ResponseEntity<Optional<LoanDTO>> findLoanById(@PathVariable String id) {
-        if (loanService.findLoanById(Integer.parseInt(id)).isEmpty()) {
+    public ResponseEntity<Optional<LoanDTO>> findLoanById(@PathVariable String id){
+        if(loanService.findLoanById(Integer.parseInt(id)).isEmpty()){
             log.info("Loan not found with ID:{}", id);
             return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
         }
@@ -40,36 +39,42 @@ public class LoanController {
 
 
     @PostMapping("/new")
-    public ResponseEntity<String> createNewLoan(@RequestBody LoanDTO loanDTO) {
-        try {
+    public ResponseEntity<String> createNewLoan(@RequestBody LoanDTO loanDTO){
+        try{
             loanService.createNewLoan(loanDTO);
             log.info("New loan saved");
             return ResponseEntity.status(200).body("New loan saved");
-        } catch (Exception e) {
+        }catch(Exception e){
             log.info("Error when saving loan: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
         }
     }
 
     @PutMapping("/modify/{id}")
-    public ResponseEntity<String> modifyLoan(@PathVariable String id, @RequestBody LoanDTO loanDTO) {
-        try {
-            loanService.modifyLoan(Integer.parseInt(id), loanDTO);
-            log.info("New loan modified");
-            return ResponseEntity.status(200).body("New loan modified");
-        } catch (Exception e) {
+    public ResponseEntity<String> modifyLoan(@PathVariable String id, @RequestBody LoanDTO loanDTO){
+        try{
+            if(loanService.findLoanById(Integer.parseInt(id)).isEmpty()){
+                log.info("Loan not found with ID:{}", id);
+                return new ResponseEntity<>("Loan not found", HttpStatus.NOT_FOUND);
+            }
+            else{
+                loanService.modifyLoan(Integer.parseInt(id), loanDTO);
+                log.info("Loan modified");
+                return ResponseEntity.status(200).body("Loan modified");
+            }
+        }catch(Exception e){
             log.info("Error when saving loan: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
         }
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteLoan(@PathVariable String id) {
+    public ResponseEntity<String> deleteLoan(@PathVariable String id){
         try {
             loanService.deleteLoanById(Integer.parseInt(id));
             log.info("Loan deleted with Id: {}", id);
             return ResponseEntity.status(200).body("Loan deleted");
-        } catch (Exception e) {
+        }catch(Exception e){
             return ResponseEntity.status(500).body("Error when deleting loan: " +
                     e.getMessage());
         }
@@ -77,12 +82,13 @@ public class LoanController {
 
     @GetMapping("/fee/{id}/{localDate}")
     public ResponseEntity<String> calculateFee(@PathVariable String id,
-                                               @PathVariable String localDate) {
-
-        if (loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)) == null) {
-            return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.NO_CONTENT);
+                                               @PathVariable String localDate){
+        if(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)) == null){
+            return new ResponseEntity<>
+                    (loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.OK);
+        return new ResponseEntity<>
+                (loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.OK);
     }
 
 

@@ -22,16 +22,16 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<UserDTO>> findAllUser() {
-        if (userService.findAllUser().isEmpty()) {
+    public ResponseEntity<List<UserDTO>> findAllUser(){
+        if(userService.findAllUser().isEmpty()){
             return new ResponseEntity<>(userService.findAllUser(), HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(userService.findAllUser(), HttpStatus.OK);
     }
 
     @GetMapping("/find/{id}")
-    public ResponseEntity<Optional<UserDTO>> findUserById(@PathVariable String id) {
-        if (userService.findUserById(Integer.parseInt(id)).isEmpty()) {
+    public ResponseEntity<Optional<UserDTO>> findUserById(@PathVariable String id){
+        if(userService.findUserById(Integer.parseInt(id)).isEmpty()){
             log.info("User not found with ID:{}", id);
             return new ResponseEntity<>(userService.findUserById(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
         }
@@ -39,21 +39,21 @@ public class UserController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<String> createNewUser(@RequestBody UserDTO userDTO) {
-        try {
+    public ResponseEntity<String> createNewUser(@RequestBody UserDTO userDTO){
+        try{
             userService.createNewUser(userDTO);
             log.info("New user saved");
             return ResponseEntity.status(200).body("New user saved");
-        } catch (Exception e) {
+        }catch(Exception e){
             log.info("Error when saving user: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving user:" + e.getMessage());
         }
     }
 
     @PutMapping("/modify/{id}")
-    public ResponseEntity<String> modifyUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
-        try {
-            if (userService.findUserById(Integer.parseInt(id)).isEmpty()) {
+    public ResponseEntity<String> modifyUser(@PathVariable String id, @RequestBody UserDTO userDTO){
+        try{
+            if(userService.findUserById(Integer.parseInt(id)).isEmpty()){
                 log.info("User not found with ID:{}", id);
                 return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
             }
@@ -62,19 +62,19 @@ public class UserController {
                 log.info("User modified");
                 return ResponseEntity.status(200).body("User modified");
             }
-        } catch (Exception e) {
+        }catch(Exception e){
             log.info("Error when saving user: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving user:" + e.getMessage());
         }
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable String id) {
-        try {
+    public ResponseEntity<String> deleteUser(@PathVariable String id){
+        try{
             userService.deleteUserById(Integer.parseInt(id));
             log.info("User deleted with Id: {}", id);
             return ResponseEntity.status(200).body("User deleted");
-        } catch (Exception e) {
+        }catch(Exception e){
             return ResponseEntity.status(500).body("Error when deleting user: " +
                     e.getMessage());
         }
@@ -90,7 +90,7 @@ public class UserController {
     }
 
     @GetMapping("/book/{userId}")
-    public ResponseEntity<List<BookDTO>> bookPerUser(@PathVariable String userId, Integer loanId){
+    public ResponseEntity<List<BookDTO>> findBookPerUser(@PathVariable String userId, Integer loanId){
         if(userService.findBookPerUser(Integer.parseInt(userId)).isEmpty()){
             log.info("Not book found for user with id: {}", userId);
             return new ResponseEntity<>(userService.findBookPerUser(Integer.parseInt(userId)), HttpStatus.NO_CONTENT);
@@ -99,12 +99,11 @@ public class UserController {
     }
 
     @GetMapping("/book/loan/{userId}")
-    public ResponseEntity<List<LoanDTO>> loanPerUser(@PathVariable String userId){
-        if(userService.showLoanPerUser(Integer.parseInt(userId)).isEmpty()){
+    public ResponseEntity<List<LoanDTO>> findLoanPerUser(@PathVariable String userId){
+        if(userService.findLoanPerUser(Integer.parseInt(userId)).isEmpty()){
             log.info("Not loan found for user with id: {}", Integer.parseInt(userId));
-            return new ResponseEntity<>(userService.showLoanPerUser(Integer.parseInt(userId)), HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(userService.findLoanPerUser(Integer.parseInt(userId)), HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(userService.showLoanPerUser(Integer.parseInt(userId)), HttpStatus.OK);
+        return new ResponseEntity<>(userService.findLoanPerUser(Integer.parseInt(userId)), HttpStatus.OK);
     }
-
 }

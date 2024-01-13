@@ -103,4 +103,16 @@ class LoanServiceTest {
         verify(loanRepository,times(1)).deleteById(loanId);
     }
 
+    @Test
+    @DisplayName("Calculate Fee Case 1")
+    public void calculateFeeCaseOne(){
+        Integer loanId= 1;
+        LocalDate localDate = LocalDate. of(2023, 12, 31);;
+        Integer days = 2;
+        String result = Constants.FEE_FIRST_TRANCHE + days + Constants.DELAY_DAYS_RESULT + 0.2;
+        //when(loanRepository.findBy()
+        //incluir findById
+        //loanService.calculateFees(loanId, localDate);
+        //assertEquals("one", loanService.calculateFees(loanId,localDate).equals());
+    }
 }
