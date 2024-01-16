@@ -30,13 +30,13 @@ public class BookController {
         return new ResponseEntity<>(bookService.findAllBook(), HttpStatus.OK);
     }
 
-    @GetMapping("/find/{id}")
-    public ResponseEntity<Optional<BookDTO>> findBookById(@PathVariable String id) {
-        if (bookService.findBookById(Integer.parseInt(id)).isEmpty()) {
-            log.info("Book not found with ID:{}", id);
-            return new ResponseEntity<>(bookService.findBookById(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
+    @GetMapping("/find/{bookId}")
+    public ResponseEntity<Optional<BookDTO>> findBookById(@PathVariable String bookId) {
+        if (bookService.findBookById(Integer.parseInt(bookId)).isEmpty()) {
+            log.info("Book not found with Id:{}", bookId);
+            return new ResponseEntity<>(bookService.findBookById(Integer.parseInt(bookId)), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(bookService.findBookById(Integer.parseInt(id)), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.findBookById(Integer.parseInt(bookId)), HttpStatus.OK);
     }
 
     @PostMapping("/new")
@@ -51,10 +51,10 @@ public class BookController {
         }
     }
 
-    @PutMapping("/modify/{id}")
-    public ResponseEntity<String> modifyBook(@PathVariable String id, @RequestBody BookDTO bookDTO) {
+    @PatchMapping("/modify")
+    public ResponseEntity<String> modifyBook(@RequestBody BookDTO bookDTO) {
         try {
-            bookService.modifyBook(Integer.parseInt(id), bookDTO);
+            bookService.modifyBook(bookDTO.getBookId(), bookDTO);
             log.info("New book modified");
             return ResponseEntity.status(200).body("New book modified");
         } catch (Exception e) {
@@ -63,11 +63,11 @@ public class BookController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteBook(@PathVariable String id) {
+    @DeleteMapping("/delete/{bookId}")
+    public ResponseEntity<String> deleteBook(@PathVariable String bookId) {
         try {
-            bookService.deleteBookById(Integer.parseInt(id));
-            log.info("Book deleted with Id: {}", id);
+            bookService.deleteBookById(Integer.parseInt(bookId));
+            log.info("Book deleted with Id: {}", bookId);
             return ResponseEntity.status(200).body("Book deleted");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error when deleting book: " +
@@ -97,7 +97,7 @@ public class BookController {
     /*@GetMapping("/available/{id}")
     public ResponseEntity<Optional<BookDTO>> findAvailableBook(@PathVariable String id) {
         if (!bookService.isBookAvailable(Integer.parseInt(id))) {
-            log.info("Book not found with ID:{}", id);
+            log.info("Book not found with Id:{}", id);
             return new ResponseEntity<>(bookService.isBookAvailable(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(bookService.isBookAvailable(Integer.parseInt(id)), HttpStatus.OK);
@@ -118,11 +118,11 @@ public class BookController {
         bookService.openNewLoanAndReduceStockIfAvailable(bookId, userId, loanDTO);
         try {
             if (bookService.isBookAvailable(bookId)) {
-                log.info("Book available with id: {}", bookId);
+                log.info("Book available with Id: {}", bookId);
                 log.info("New loan saved");
                 return ResponseEntity.status(200).body("The book is available, new loan saved");
             } else {
-                log.info("Book not available with id: {}", bookId);
+                log.info("Book not available with Id: {}", bookId);
                 return ResponseEntity.status(200).body("The book is not available");
             }
         } catch (Exception e) {
@@ -138,12 +138,12 @@ public class BookController {
         try {
             if (bookService.isBookAvailable(Integer.parseInt(bookId))) {
                 bookService.deleteLoanAndIncreaseStockIfAvailable(Integer.parseInt(bookId), Integer.parseInt(userId));
-                log.info("Book available with id: {}", bookId);
+                log.info("Book available with Id: {}", bookId);
                 log.info("Loan deleted with Id: {}",
                         bookService.findLoanId(Integer.parseInt(bookId), Integer.parseInt(userId)));
                 return ResponseEntity.status(200).body("Loan deleted");
             } else {
-                log.info("Book not available with id: {}", bookId);
+                log.info("Book not available with Id: {}", bookId);
                 return ResponseEntity.status(200).body("The book is not available");
             }
         } catch (Exception e) {
@@ -153,10 +153,10 @@ public class BookController {
         }
     }
 
-    @PatchMapping("/available/reduce/{id}")
-    public ResponseEntity<String> reduceAvailableStock(@PathVariable String id) {
+    @PatchMapping("/available/reduce/{bookId}")
+    public ResponseEntity<String> reduceAvailableStock(@PathVariable String bookId) {
         try {
-            bookService.reduceBookQuantity(Integer.parseInt(id));
+            bookService.reduceBookQuantity(Integer.parseInt(bookId));
             log.info("New book modified");
             return ResponseEntity.status(200).body("New book modified");
         } catch (Exception e) {

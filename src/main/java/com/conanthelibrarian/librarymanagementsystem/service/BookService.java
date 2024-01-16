@@ -29,8 +29,8 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<BookDTO> findBookById(Integer id) {
-        return bookRepository.findById(id).stream()
+    public Optional<BookDTO> findBookById(Integer bookId) {
+        return bookRepository.findById(bookId).stream()
                 .map(bookMapper::bookToBookDTO)
                 .findAny();
     }
@@ -41,20 +41,19 @@ public class BookService {
         log.info("Book saved with title: {}", bookDTO.getTitle());
     }
 
-    public BookDTO modifyBook(Integer id, BookDTO bookDTO) {
-        Optional<Book> bookOptional = bookRepository.findById(id);
+    public void modifyBook(Integer bookId, BookDTO bookDTO) {
+        Optional<Book> bookOptional = bookRepository.findById(bookId);
         if (bookOptional.isPresent()) {
             Book book = bookMapper.bookDTOToBook(bookDTO);
             bookRepository.save(book);
             log.info("Book modified with title: {}", bookDTO.getTitle());
         }
-        return bookDTO;
     }
 
-    public void deleteBookById(Integer id) {
-        if (id != null) {
-            bookRepository.deleteById(id);
-            log.info("Book deleted with id: {}", id);
+    public void deleteBookById(Integer bookId) {
+        if (bookId != null) {
+            bookRepository.deleteById(bookId);
+            log.info("Book deleted with bookId: {}", bookId);
         }
     }
 
@@ -69,7 +68,7 @@ public class BookService {
     public void openNewLoanAndReduceStockIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO) {
         try {
             if (isBookAvailable(bookId)) {
-                System.out.println("Available");
+                System.out.println("Available"); //todo cambiar por log
                 createNewLoanIfAvailable(bookId, userId, loanDTO);
                 reduceBookQuantity(bookId);
             } else {
@@ -114,7 +113,7 @@ public class BookService {
         return true;
     }
 
-    private void createNewLoanIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO) {
+    public void createNewLoanIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO) {
         loanDTO.setUserId(userId);
         loanDTO.setBookId(bookId);
         loanService.createNewLoan(loanDTO);
@@ -123,9 +122,14 @@ public class BookService {
     public void reduceBookQuantity(Integer bookId) {
         Optional<Book> bookOptional = bookRepository.findById(bookId);
         if (bookOptional.isPresent()) {
-            bookOptional.get().setAvailableCopies(bookOptional.get().getAvailableCopies() - 1);
-            bookRepository.save(bookOptional.get());
-            log.info("Book modified with title: {}", bookOptional.get().getTitle());
+            if (bookOptional.get().getAvailableCopies() >= 1) {
+                bookOptional.get().setAvailableCopies(bookOptional.get().getAvailableCopies() - 1);
+                bookRepository.save(bookOptional.get());
+                log.info("Book modified with title: {}", bookOptional.get().getTitle());
+            }
+            else{
+                log.info("Not available copies");
+            }
         }
     }
 
@@ -142,9 +146,14 @@ public class BookService {
     public void increaseBookQuantity(Integer bookId) {
         Optional<Book> bookOptional = bookRepository.findById(bookId);
         if (bookOptional.isPresent()) {
-            bookOptional.get().setAvailableCopies(bookOptional.get().getAvailableCopies() + 1);
-            bookRepository.save(bookOptional.get());
-            log.info("Book modified with title: {}", bookOptional.get().getTitle());
+            if (bookOptional.get().getAvailableCopies() >= 1) {
+                bookOptional.get().setAvailableCopies(bookOptional.get().getAvailableCopies() + 1);
+                bookRepository.save(bookOptional.get());
+                log.info("Book modified with title: {}", bookOptional.get().getTitle());
+            }
+            else{
+                log.info("Not available copies");
+            }
         }
     }
 
