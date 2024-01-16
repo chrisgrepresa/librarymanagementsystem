@@ -117,8 +117,8 @@ public class BookController {
 
     @PostMapping("/new/book/{bookId}/user/{userId}")
     public ResponseEntity<String> openNewLoanIfAvailable(@PathVariable Integer bookId, @PathVariable Integer userId,
-                                                         @RequestBody LoanDTO loanDTO){
-        bookService.openNewLoanAndReduceStockIfAvailable(bookId, userId, loanDTO);
+                                                         @RequestBody LoanDTO loanDTO, BookDTO bookDTO){
+        bookService.openNewLoanAndReduceStockIfAvailable(bookId, userId, loanDTO, bookDTO);
         try{
             if(bookService.isBookAvailable(bookId)){
                 log.info("Book available with id: {}", bookId);
@@ -157,11 +157,17 @@ public class BookController {
     }
 
     @PatchMapping("/available/reduce/{id}")
-    public ResponseEntity<String> reduceAvailableStock(@PathVariable String id){
+    public ResponseEntity<String> reduceAvailableStock(@PathVariable String id, @RequestBody BookDTO bookDTO){
         try{
-            bookService.reduceAvailableStock(Integer.parseInt(id));
-            log.info("Book modified");
-            return ResponseEntity.status(200).body("Book modified");
+            if(bookService.findBookById(Integer.parseInt(id)).isEmpty()){
+                log.info("Book not found with ID:{}", id);
+                return new ResponseEntity<>("Book not found", HttpStatus.NOT_FOUND);
+            }
+            else{
+                bookService.reduceAvailableStock(Integer.parseInt(id), bookDTO);
+                log.info("Book modified");
+                return ResponseEntity.status(200).body("Book modified");
+            }
         }catch(Exception e){
             log.info("Error when saving book: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving book:" + e.getMessage());

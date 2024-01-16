@@ -60,11 +60,9 @@ public class UserService {
             log.info("User deleted with id: {}", id);
         }
     }
-
     public List<UserDTO> findUserInLoan(Integer quantity){
         return userRepository.findUserInLoanForQuantity(quantity);
     }
-
     public List<BookDTO> findBookPerUser(Integer userId){
         for (LoanDTO loans : findLoanPerUser(userId)){
             List<BookDTO> bookDTOList = bookRepository.findAll().stream()

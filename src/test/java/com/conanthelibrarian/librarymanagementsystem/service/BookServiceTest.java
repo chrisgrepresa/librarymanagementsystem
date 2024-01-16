@@ -115,8 +115,6 @@ class BookServiceTest {
         assertEquals("author", bookService.findBookInLoan().get(0).getAuthor());
     }
 
-    //todo por aquí me he quedado
-
 
     //todo  CORREGIR!
     @Test
@@ -161,26 +159,19 @@ class BookServiceTest {
     @Test
     @DisplayName("Reduce Book Quantity")
     public void reduceBookQuantityTest(){
-        /*Integer bookId = 1;
-        Book book = new Book();
-        BookDTO bookDTO = new BookDTO(2, "title", "author", 1l, "genre", 3);
+        Integer bookId = 1;
+        Book book = new Book(2, "title", "author", 1l, "genre", 3);
+        BookDTO bookDTO = new BookDTO();
         Optional<Book> bookOptional = Optional.of(book);
+        when(bookMapper.bookDTOToBook(any(BookDTO.class))).thenReturn(book);
         when(bookRepository.findById(bookId)).thenReturn(bookOptional);
-        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
-        Optional<BookDTO> result = bookService.findBookById(bookId);
-        bookService.reduceBookQuantity(bookId);
-        assertTrue(result.isPresent());*/
-
-        /*Integer bookId = 1;
-        Book book = new Book();
-        BookDTO bookDTO = new BookDTO(2, "title", "author", 1l, "genre", 3);
-        Optional<Book> bookOptional = Optional.of(book);
-        when(bookRepository.findById(bookId)).thenReturn(bookOptional);
-        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
-        bookService.reduceBookQuantity(bookId);
+        bookService.reduceAvailableStock(bookId, bookDTO);
+        verify(bookRepository,times(1)).save(book);
         assertEquals("author", bookOptional.get().getAuthor());
-        Mockito.verify(bookMapper).bookToBookDTO(book);*/
+        Mockito.verify(bookMapper).bookDTOToBook(bookDTO);
     }
+
+
 
 
 }
