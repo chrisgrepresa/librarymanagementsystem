@@ -84,13 +84,20 @@ public class UserController {
     }
 
     @GetMapping("/book/{userId}")
-    public List<BookDTO> bookPerUser(@PathVariable String userId, Integer loanId){
-        return userService.findBookPerUser(Integer.parseInt(userId));
+    public ResponseEntity<List<BookDTO>> findBookPerUser(@PathVariable String userId, Integer loanId){
+        if(userService.findBookPerUser(Integer.parseInt(userId)).isEmpty()){
+            log.info("Not book found for user with id: {}", userId);
+            return new ResponseEntity<>(userService.findBookPerUser(Integer.parseInt(userId)), HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(userService.findBookPerUser(Integer.parseInt(userId)), HttpStatus.OK);
     }
 
     @GetMapping("/book/loan/{userId}")
-    public List<Loan> loanPerUser(@PathVariable Integer userId){
-        return userService.showLoanPerUser(userId);
+    public ResponseEntity<List<Loan>> findLoanPerUser(@PathVariable String userId){
+        if(userService.findLoanPerUser(Integer.parseInt(userId)).isEmpty()){
+            log.info("Not loan found for user with id: {}", Integer.parseInt(userId));
+            return new ResponseEntity<>(userService.findLoanPerUser(Integer.parseInt(userId)), HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(userService.findLoanPerUser(Integer.parseInt(userId)), HttpStatus.OK);
     }
-
 }

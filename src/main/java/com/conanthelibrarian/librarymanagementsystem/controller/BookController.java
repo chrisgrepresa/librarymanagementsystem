@@ -51,7 +51,7 @@ public class BookController {
         }
     }
 
-    @PatchMapping("/modify")
+    @PutMapping("/modify")
     public ResponseEntity<String> modifyBook(@RequestBody BookDTO bookDTO) {
         try {
             bookService.modifyBook(bookDTO.getBookId(), bookDTO);
@@ -94,17 +94,17 @@ public class BookController {
     }
 
 
-    /*@GetMapping("/available/{id}")
-    public ResponseEntity<Optional<BookDTO>> findAvailableBook(@PathVariable String id) {
+    @GetMapping("/available/{id}")
+    public ResponseEntity<Boolean> findAvailableBook(@PathVariable String id) {
         if (!bookService.isBookAvailable(Integer.parseInt(id))) {
             log.info("Book not found with Id:{}", id);
             return new ResponseEntity<>(bookService.isBookAvailable(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(bookService.isBookAvailable(Integer.parseInt(id)), HttpStatus.OK);
-    }*/
+    }
 
     @GetMapping("/filter/{parameter}")
-    public ResponseEntity<List<BookDTO>> filterBook (@PathVariable String parameter) {
+    public ResponseEntity<List<BookDTO>> filterBook(@PathVariable String parameter) {
         if (bookService.filterBook(parameter).isEmpty()) {
             log.info("Books not found for parameter: {}", parameter);
             return new ResponseEntity<>(bookService.filterBook(parameter), HttpStatus.NO_CONTENT);
@@ -134,7 +134,7 @@ public class BookController {
 
     @DeleteMapping("/return/book/{bookId}/user/{userId}")
     public ResponseEntity<String> deleteLoanIfAvailable(@PathVariable String bookId, @PathVariable String userId
-                                                        ) {
+    ) {
         try {
             if (bookService.isBookAvailable(Integer.parseInt(bookId))) {
                 bookService.deleteLoanAndIncreaseStockIfAvailable(Integer.parseInt(bookId), Integer.parseInt(userId));
@@ -156,7 +156,7 @@ public class BookController {
     @PatchMapping("/available/reduce/{bookId}")
     public ResponseEntity<String> reduceAvailableStock(@PathVariable String bookId) {
         try {
-            bookService.reduceBookQuantity(Integer.parseInt(bookId));
+            bookService.reduceAvailableStock(Integer.parseInt(bookId));
             log.info("New book modified");
             return ResponseEntity.status(200).body("New book modified");
         } catch (Exception e) {

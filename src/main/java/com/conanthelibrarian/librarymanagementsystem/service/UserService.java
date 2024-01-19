@@ -68,9 +68,9 @@ public class UserService {
     }
 
     public List<BookDTO> findBookPerUser(Integer userId) {
-        for (Loan loans : showLoanPerUser(userId)) {
+        for (Loan loans : findLoanPerUser(userId)) {
             List<BookDTO> listOfBooks = bookRepository.findAll().stream()
-                    .filter(book -> showLoanPerUser(userId).stream()
+                    .filter(book -> findLoanPerUser(userId).stream()
                             .anyMatch(loan ->
                                     loan.getUserId().equals(userId) && book.getBookId().equals(loan.getBookId()) )
                     )
@@ -84,8 +84,8 @@ public class UserService {
     }
 
 
-    public List<Loan> showLoanPerUser(Integer userId) {
-        return loanRepository.findByUserId(userId);
+    public List<Loan> findLoanPerUser(Integer userId) {
+        return loanRepository.findLoanByUserId(userId);
     }
 
 }
