@@ -94,13 +94,13 @@ public class BookController {
     }
 
 
-    @GetMapping("/available/{id}")
-    public ResponseEntity<Boolean> findAvailableBook(@PathVariable String id) {
-        if (!bookService.isBookAvailable(Integer.parseInt(id))) {
-            log.info("Book not found with Id:{}", id);
-            return new ResponseEntity<>(bookService.isBookAvailable(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
+    @GetMapping("/available/{bookId}")
+    public ResponseEntity<Boolean> findAvailableBook(@PathVariable String bookId) {
+        if (!bookService.isBookAvailable(Integer.parseInt(bookId))) {
+            log.info("Book not found with Id:{}", bookId);
+            return new ResponseEntity<>(bookService.isBookAvailable(Integer.parseInt(bookId)), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(bookService.isBookAvailable(Integer.parseInt(id)), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.isBookAvailable(Integer.parseInt(bookId)), HttpStatus.OK);
     }
 
     @GetMapping("/filter/{parameter}")
@@ -123,8 +123,9 @@ public class BookController {
                 return ResponseEntity.status(200).body("The book is available, new loan saved");
             } else {
                 log.info("Book not available with Id: {}", bookId);
-                return ResponseEntity.status(200).body("The book is not available");
+                return ResponseEntity.status(404).body("The book is not available");
             }
+
         } catch (Exception e) {
             log.info("Error when saving loan: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
@@ -144,7 +145,7 @@ public class BookController {
                 return ResponseEntity.status(200).body("Loan deleted");
             } else {
                 log.info("Book not available with Id: {}", bookId);
-                return ResponseEntity.status(200).body("The book is not available");
+                return ResponseEntity.status(404).body("The book is not available");
             }
         } catch (Exception e) {
             log.info("Error when saving loan: {}" + e.getMessage());

@@ -1,5 +1,6 @@
 package com.conanthelibrarian.librarymanagementsystem.controller;
 
+import com.conanthelibrarian.librarymanagementsystem.dao.Book;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.BookService;
 import org.junit.jupiter.api.DisplayName;
@@ -146,4 +147,137 @@ class BookControllerTest {
         ResponseEntity<String> result = bookController.deleteBook(id);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
+
+    @Test
+    @DisplayName("Find Book By Genre")
+    public void findBookByGenreTest(){
+        String genre = "genre";
+        List<BookDTO> bookDTOList = List.of(BookDTO.builder().author("author").build());
+        when(bookService.findBookByGenre(genre)).thenReturn(bookDTOList);
+        ResponseEntity<List<BookDTO>> result = bookController.findBookByGenre(genre);
+        assertEquals("author", result.getBody().get(0).getAuthor());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Find Book By Genre No Content")
+    public void findBookByGenreNotFoundTest(){
+        String genre = "genre";
+        List<BookDTO> bookDTOList = List.of();
+        when(bookService.findBookByGenre(genre)).thenReturn(bookDTOList);
+        ResponseEntity<List<BookDTO>> result = bookController.findBookByGenre(genre);
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Find Book By Genre Wrong Path Variable")
+    public void findBookByGenreWrongPathVariableTest(){
+        String genre= "ñ";
+        List<BookDTO> bookDTOList = List.of();
+        when(bookService.findBookByGenre(genre)).thenReturn(bookDTOList);
+        ResponseEntity<List<BookDTO>> result = bookController.findBookByGenre(genre);
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Find Book In Loan")
+    public void findBookInLoanTest(){
+    //Given:
+        List<BookDTO> bookDTOList = List.of(BookDTO.builder().author("author").build());
+    //When:
+        when(bookService.findBookInLoan()).thenReturn(bookDTOList);
+    //Then:
+        ResponseEntity<List<BookDTO>> result = bookController.findBookInLoan();
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("author", result.getBody().get(0).getAuthor());
+    }
+
+    @Test
+    @DisplayName("Find Book In Loan No Content")
+    public void findBookInLoanNoContentTest(){
+        //Given:
+        List<BookDTO> bookDTOList = List.of();
+        //When:
+        when(bookService.findBookInLoan()).thenReturn(bookDTOList);
+        //Then:
+        ResponseEntity<List<BookDTO>> result = bookController.findBookInLoan();
+        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Find Available Book")
+    public void findAvailableBookTest(){
+        //Given:
+        String bookId = "1";
+        //When:
+        when(bookService.isBookAvailable(Mockito.anyInt())).thenReturn(true);
+        //Then:
+        ResponseEntity<Boolean> result = bookController.findAvailableBook(bookId);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Find Available Book Not Found")
+    public void findAvailableBookNotFoundTest(){
+        //Given:
+        String bookId = "1";
+        //When:
+        when(bookService.isBookAvailable(Mockito.anyInt())).thenReturn(false);
+        //Then:
+        ResponseEntity<Boolean> result = bookController.findAvailableBook(bookId);
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Find Available Book Wrong Path Variable")
+    public void findAvailableBookWrongPathVariableTest(){
+        String bookId = "ñ";
+        assertThrows(Exception.class,() -> {
+            ResponseEntity<Boolean> result = bookController.findAvailableBook(bookId);
+        });
+    }
+
+    @Test
+    @DisplayName("Filter Book")
+    public void filterBookTest(){
+        //Given:
+        String parameter = "parameter";
+        List<BookDTO> bookDTOList = List.of(BookDTO.builder().author("author").build());
+        //When:
+        when(bookService.filterBook(Mockito.any())).thenReturn(bookDTOList);
+        //Then:
+        ResponseEntity<List<BookDTO>> result = bookController.filterBook(parameter);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Filter Book No Content")
+    public void filterBookNoContentTest(){
+        //Given:
+        String parameter = "parameter";
+        List<BookDTO> bookDTOList = List.of();
+        //When:
+        when(bookService.filterBook(Mockito.any())).thenReturn(bookDTOList);
+        //Then:
+        ResponseEntity<List<BookDTO>> result = bookController.filterBook(parameter);
+        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Filter Book Wrong Path Variable")
+    public void filterBookWrongPathVariableTest(){
+        //Given:
+        String parameter = "ñ";
+        List<BookDTO> bookDTOList = List.of();
+        //When:
+        when(bookService.filterBook(Mockito.any())).thenReturn(bookDTOList);
+        //Then:
+        ResponseEntity<List<BookDTO>> result = bookController.filterBook(parameter);
+        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
+    }
+    //Given:
+    //When:
+    //Then:
+
+    //todo OpenNewLoan
 }

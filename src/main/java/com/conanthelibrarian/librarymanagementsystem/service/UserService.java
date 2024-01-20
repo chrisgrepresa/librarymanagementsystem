@@ -69,15 +69,15 @@ public class UserService {
 
     public List<BookDTO> findBookPerUser(Integer userId) {
         for (Loan loans : findLoanPerUser(userId)) {
-            List<BookDTO> listOfBooks = bookRepository.findAll().stream()
+            List<BookDTO> bookDTOList = bookRepository.findAll().stream()
                     .filter(book -> findLoanPerUser(userId).stream()
                             .anyMatch(loan ->
-                                    loan.getUserId().equals(userId) && book.getBookId().equals(loan.getBookId()) )
+                                    loan.getUserId().equals(userId) && book.getBookId().equals(loan.getBookId()))
                     )
                     .map(bookMapper::bookToBookDTO)
                     .collect(Collectors.toList());
-            log.info("List of books for userId{} : {} ", userId, listOfBooks);
-            return listOfBooks;
+            log.info("List of books for userId{} : {} ", userId, bookDTOList);
+
         }
         log.info("Does not work");
         return null;

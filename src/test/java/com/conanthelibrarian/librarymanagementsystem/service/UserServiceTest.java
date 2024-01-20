@@ -231,18 +231,17 @@ class UserServiceTest {
 
     //todo findBookByUser
 
-    /*@Test
-    @DisplayName("Find Loan Per User")
+    @Test
+    @DisplayName("Find Book Per User")
     public void findBookPerUserTest() {
         //Given:
         Integer userId = 1;
-        Book book = Book.builder().author("author").build();
         BookDTO bookDTO = BookDTO.builder().author("author").build();
         List<Loan> loanList = List.of(Loan.builder()
                 .userId(1)
                 .bookId(2)
                 .build());
-        List<Book> bookList = List.of(book);
+        List<Book> bookList = List.of(Book.builder().author("author").build());
         //When:
         when(userService.findLoanPerUser(userId)).thenReturn(loanList);
         when(bookRepository.findAll()).thenReturn(bookList);
@@ -250,7 +249,16 @@ class UserServiceTest {
         //Then:
         List<BookDTO> result = userService.findBookPerUser(userId);
         assertEquals("author", result.get(0).getAuthor());
-    }*/
+    }
+
+    @Test
+    @DisplayName("Find Loan Per User Wrong Path Variable")
+    public void findBookPerUserWrongPathVariableTest() {
+        String userId = "ñ";
+        assertThrows(Exception.class, () -> {
+            List<BookDTO> result = userService.findBookPerUser(Integer.parseInt(userId));
+        });
+    }
 
     @Test
     @DisplayName("Find Loan Per User")

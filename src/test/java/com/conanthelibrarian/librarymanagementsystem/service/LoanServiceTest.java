@@ -188,4 +188,9 @@ class LoanServiceTest {
         });
     }
 
+    @Test
+    @DisplayName("Calculate Fees Case 1")
+    public void calculateFeesCaseOneTest() {
+        //todo
+    }
 }
