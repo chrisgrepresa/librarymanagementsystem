@@ -11,8 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +37,7 @@ class LoanServiceTest {
     LoanMapper loanMapper;
 
     //TODO CAMBIAR SINGLETON
-   @Test
+    @Test
     @DisplayName("Find All Loans")
     public void findAllLoanTest() {
         Loan loan = new Loan();
@@ -65,15 +67,15 @@ class LoanServiceTest {
     @DisplayName("Find Loan By Id")
     public void findLoanByIdTest() {
         Integer loanId = 1;
-        LocalDate localDateStart = LocalDate.of(2023,12,28);
-        LocalDate localDateEnd = LocalDate.of(2023,12,30);
+        LocalDate localDateStart = LocalDate.of(2023, 12, 28);
+        LocalDate localDateEnd = LocalDate.of(2023, 12, 30);
         Loan loan = new Loan();
-        LoanDTO loanDTO = new LoanDTO(2, 1,1, localDateStart, localDateEnd);
+        LoanDTO loanDTO = new LoanDTO(2, 1, 1, localDateStart, localDateEnd);
         Optional<Loan> loanOptional = Optional.of(loan);
         when(loanRepository.findById(loanId)).thenReturn(loanOptional);
         when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
         Optional<LoanDTO> result = loanService.findLoanById(loanId);
-        assertEquals(LocalDate.of(2023,12, 28), result.get().getLoanDate());
+        assertEquals(LocalDate.of(2023, 12, 28), result.get().getLoanDate());
         Mockito.verify(loanMapper).loanToLoanDTO(loan);
     }
 
@@ -189,8 +191,47 @@ class LoanServiceTest {
     }
 
     @Test
-    @DisplayName("Calculate Fees Case 1")
-    public void calculateFeesCaseOneTest() {
-        //todo
+    @DisplayName("Calculate Fees")
+    public void calculateFeesTest() {
+        //Given:
+        Integer loanId = 2;
+        LocalDate localDate = LocalDate.of(2023, 12, 10);
+        Loan loan = new Loan();
+        Optional<Loan> loanOptional = Optional.of(loan);
+        LoanDTO loanDTO = LoanDTO.builder().dueDate(LocalDate.of(2023,10,06)).build();
+        //When:
+        when(loanRepository.findById(Mockito.anyInt())).thenReturn(loanOptional);
+        when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
+        //Then:
+        String result = loanService.calculateFees(loanId, localDate);
+        assertEquals(Constants.FEE_FOURTH_TRANCHE + 65 + Constants.DELAY_DAYS_RESULT + 65.0,
+                result);
+    }
+
+    @Test
+    @DisplayName("Calculate Fees Result Impossible")
+    public void calculateResultImpossibleTest() {
+        //Given:
+        Integer loanId = 2;
+        LocalDate localDate = LocalDate.of(2012, 12, 10);
+        Loan loan = new Loan();
+        Optional<Loan> loanOptional = Optional.of(loan);
+        LoanDTO loanDTO = LoanDTO.builder().dueDate(LocalDate.of(2023,10,06)).build();
+        //When:
+        when(loanRepository.findById(Mockito.anyInt())).thenReturn(loanOptional);
+        when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
+        //Then:
+        String result = loanService.calculateFees(loanId, localDate);
+        assertEquals(Constants.RESULT_IMPOSSIBLE, result);
+    }
+
+    @Test
+    @DisplayName("Calculate Fees Wrong Path Variable")
+    public void calculateWrongPathVariableTest() {
+        String loanId = "ñ";
+        LocalDate localDate = LocalDate.of(2023, 12, 10);
+        assertThrows(Exception.class, () -> {
+            String result = loanService.calculateFees(Integer.parseInt(loanId), localDate);
+        });
     }
 }

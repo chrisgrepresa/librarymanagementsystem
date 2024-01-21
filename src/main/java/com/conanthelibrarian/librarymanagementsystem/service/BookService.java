@@ -82,12 +82,12 @@ public class BookService {
     public void deleteLoanAndIncreaseStockIfAvailable(Integer bookId, Integer userId) {
         try {
             if (isBookAvailable(bookId)) {
-                System.out.println("Available");
+                log.info("Available");
                 findLoanId(bookId, userId);
                 loanService.deleteLoanById(findLoanId(bookId, userId));
                 increaseBookQuantity(bookId);
             } else {
-                System.out.println("Not available");
+                log.info("Not available");
             }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

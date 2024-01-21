@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.*;
 
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+//@MockitoSettings(strictness = Strictness.LENIENT)
 class BookServiceTest {
 
     @InjectMocks
@@ -190,15 +193,15 @@ class BookServiceTest {
     }
 
     //todo CORREGIR
-    /*@Test
+    @Test
     @DisplayName("Find Book by Genre No Content")
     public void findBookByGenreNoContestTest(){
         String stringGenre = "stringGenre";
         List<BookDTO> bookDTOList = List.of();
         when(bookRepository.findBookByGenre(stringGenre)).thenReturn(bookDTOList);
-        List<BookDTO> result = bookService.filterBook(stringGenre);
-        assertTrue(result.isEmpty());
-    }*/
+        bookService.filterBook(stringGenre);
+        assertTrue(bookService.filterBook(stringGenre).isEmpty());
+    }
 
     @Test
     @DisplayName("Find Book In Loan")
@@ -216,21 +219,41 @@ class BookServiceTest {
         assertTrue(bookService.findBookInLoan().isEmpty());
     }
 
-
-    //todo openNewLoanAndReduceStockIfAvailable
-
     @Test
     @DisplayName("Open New Loan And Reduce Stock If Available")
     public void openNewLoanAndReduceStockIfAvailableTest() {
         //Given:
+        Integer bookId = 1;
+        Integer userId = 2;
+        LoanDTO loanDTO = LoanDTO.builder().loanId(3).build();
+        boolean resultAvailable = true;
+        Book book = Book.builder().author("author").build();
+        BookDTO bookDTO = BookDTO.builder().author("author").build();
+        Optional<Book> bookOptional = Optional.of(Book.builder().author("author").build());
         //When:
+        when(bookRepository.findById(Mockito.anyInt())).thenReturn(bookOptional);
+        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
+        when(bookService.isBookAvailable(Mockito.anyInt())).thenReturn(resultAvailable);
         //Then:
-        openNewLoanAndReduceStockIfAvailableTest();
+        bookService.createNewLoanIfAvailable(bookId, userId, loanDTO);
+        bookService.openNewLoanAndReduceStockIfAvailable(bookId, userId, loanDTO);
         Mockito.verify(loanService).createNewLoan(Mockito.any());
 
     }
 
     //todo deleteLoanAndIncreaseStockIfAvailable
+
+    @Test
+    @DisplayName("Delete Loan And Increase Stock If Available")
+    public void deleteLoanAndIncreaseStockIfAvailable(){
+        //Given:
+        Integer bookId = 1;
+        Integer userId = 2;
+        //When:
+        //Then:
+        bookService.deleteLoanAndIncreaseStockIfAvailable(bookId, userId);
+        Mockito.verify(bookService, never()).deleteBookById(bookId);
+    }
 
     //todo filterBook corregir
     /*@Test

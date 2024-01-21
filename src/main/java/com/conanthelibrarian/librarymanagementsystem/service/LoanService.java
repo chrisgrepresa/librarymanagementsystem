@@ -63,23 +63,23 @@ public class LoanService {
                 : (16 <= days && days <= 29) ? 3 : (30 <= days) ? 4 : 5){
             case 1 -> {
                 log.info("First fee");
-                Double firstFee = days * 0.10;
-                return Constants.FEE_FIRST_TRANCHE + days + Constants.DELAY_DAYS_RESULT + firstFee;
+                Double fee = days * 0.10;
+                return Constants.FEE_FIRST_TRANCHE + days + Constants.DELAY_DAYS_RESULT + fee;
             }
             case 2 -> {
                 log.info("Second fee");
-                Double secondFee = days * 0.25;
-                return Constants.FEE_SECOND_TRANCHE + days + Constants.DELAY_DAYS_RESULT + secondFee;
+                Double fee = days * 0.25;
+                return Constants.FEE_SECOND_TRANCHE + days + Constants.DELAY_DAYS_RESULT + fee;
             }
             case 3 -> {
                 log.info("Third fee");
-                Double thirdFee = days * 0.50;
-                return Constants.FEE_THIRD_TRANCHE + days + Constants.DELAY_DAYS_RESULT + thirdFee;
+                Double fee = days * 0.50;
+                return Constants.FEE_THIRD_TRANCHE + days + Constants.DELAY_DAYS_RESULT + fee;
             }
             case 4 -> {
                 log.info("Fourth fee");
-                Double fourthFee = days * 1.0;
-                return Constants.FEE_FOURTH_TRANCHE + days + Constants.DELAY_DAYS_RESULT + fourthFee;
+                Double fee = days * 1.0;
+                return Constants.FEE_FOURTH_TRANCHE + days + Constants.DELAY_DAYS_RESULT + fee;
             }
         }
         return Constants.RESULT_IMPOSSIBLE;
