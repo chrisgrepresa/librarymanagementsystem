@@ -240,7 +240,39 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Find Loan Per User Wrong Path Variable")
+    @DisplayName("Find Book Per User Loan Not Found")
+    public void findBookPerUserLoanNotFoundTest() {
+        //Given:
+        Integer userId = 1;
+        List<Loan> loanList = List.of();
+        //When:
+        when(userService.findLoanPerUser(userId)).thenReturn(loanList);
+        //Then:
+        List<BookDTO> result = userService.findBookPerUser(userId);
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("Find Book Per User Book Not Found")
+    public void findBookPerUserBookNotFoundTest() {
+        //Given:
+        Integer userId = 1;
+        List<Loan> loanList = List.of(Loan.builder()
+                .userId(1)
+                .bookId(2)
+                .build());
+        List<Book> bookList = List.of();
+        List<BookDTO> bookDTOList = List.of();
+        //When:
+        when(userService.findLoanPerUser(userId)).thenReturn(loanList);
+        when(bookRepository.findAll()).thenReturn(bookList);
+        //Then:
+        List<BookDTO> result = userService.findBookPerUser(userId);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Find Book Per User Wrong Path Variable")
     public void findBookPerUserWrongPathVariableTest() {
         String userId = "ñ";
         assertThrows(Exception.class, () -> {

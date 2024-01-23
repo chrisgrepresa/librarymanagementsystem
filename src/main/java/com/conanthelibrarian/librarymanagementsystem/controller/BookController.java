@@ -165,6 +165,18 @@ public class BookController {
             return ResponseEntity.status(500).body("Error when saving book:" + e.getMessage());
         }
     }
+
+    @PatchMapping("/available/increase/{bookId}")
+    public ResponseEntity<String> increaseAvailableStock(@PathVariable String bookId) {
+        try {
+            bookService.increaseAvailableStock(Integer.parseInt(bookId));
+            log.info("New book modified");
+            return ResponseEntity.status(200).body("New book modified");
+        } catch (Exception e) {
+            log.info("Error when saving book: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Error when saving book:" + e.getMessage());
+        }
+    }
 }
 
 

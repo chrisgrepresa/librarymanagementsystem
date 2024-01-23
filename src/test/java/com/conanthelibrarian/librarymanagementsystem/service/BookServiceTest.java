@@ -1,7 +1,6 @@
 package com.conanthelibrarian.librarymanagementsystem.service;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.Book;
-import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.BookMapper;
@@ -13,8 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 import java.util.*;
 
@@ -643,7 +640,7 @@ class BookServiceTest {
         //When:
         when(bookRepository.findById(bookId)).thenReturn(bookOptional);
         //Then:
-        bookService.increaseBookQuantity(bookId);
+        bookService.increaseAvailableStock(bookId);
         Mockito.verify(bookRepository).save(bookOptional.get());
     }
 
@@ -656,7 +653,7 @@ class BookServiceTest {
         //When:
         when(bookRepository.findById(bookId)).thenReturn(bookOptional);
         //Then:
-        bookService.increaseBookQuantity(bookId);
+        bookService.increaseAvailableStock(bookId);
         Mockito.verify(bookRepository, never()).save(Mockito.any());
     }
 
@@ -672,7 +669,7 @@ class BookServiceTest {
         //When:
         when(bookRepository.findById(bookId)).thenReturn(bookOptional);
         //Then:
-        bookService.increaseBookQuantity(bookId);
+        bookService.increaseAvailableStock(bookId);
         Mockito.verify(bookRepository, never()).save(Mockito.any());
     }
 

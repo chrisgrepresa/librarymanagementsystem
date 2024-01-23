@@ -386,4 +386,23 @@ class BookControllerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
 
+    @Test
+    @DisplayName("Increase Available Stock")
+    public void increaseAvailableStockTest(){
+        //Given:
+        String bookId = "1";
+        //Then:
+        ResponseEntity<String> result = bookController.increaseAvailableStock(bookId);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Increase Available Stock Internal Server Error")
+    public void increaseAvailableInternalServerErrorTest(){
+        //Given:
+        String bookId = "ñ";
+        //Then:
+        ResponseEntity<String> result = bookController.increaseAvailableStock(bookId);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+    }
 }

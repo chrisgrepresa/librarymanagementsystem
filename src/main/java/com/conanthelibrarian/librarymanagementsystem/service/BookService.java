@@ -66,31 +66,23 @@ public class BookService {
     }
 
     public void openNewLoanAndReduceStockIfAvailable(Integer bookId, Integer userId, LoanDTO loanDTO) {
-        try {
-            if (isBookAvailable(bookId)) {
-                log.info("Available");
-                createNewLoanIfAvailable(bookId, userId, loanDTO);
-                reduceAvailableStock(bookId);
-            } else {
-                log.info("Not available");
-            }
-        } catch (Exception e) {
-            System.out.println("Error" + e.getMessage());
+        if (isBookAvailable(bookId)) {
+            log.info("Available");
+            createNewLoanIfAvailable(bookId, userId, loanDTO);
+            reduceAvailableStock(bookId);
+        } else {
+            log.info("Not available");
         }
     }
 
     public void deleteLoanAndIncreaseStockIfAvailable(Integer bookId, Integer userId) {
-        try {
-            if (isBookAvailable(bookId)) {
-                log.info("Available");
-                findLoanId(bookId, userId);
-                loanService.deleteLoanById(findLoanId(bookId, userId));
-                increaseBookQuantity(bookId);
-            } else {
-                log.info("Not available");
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+        if (isBookAvailable(bookId)) {
+            log.info("Available");
+            findLoanId(bookId, userId);
+            loanService.deleteLoanById(findLoanId(bookId, userId));
+            increaseAvailableStock(bookId);
+        } else {
+            log.info("Not available");
         }
     }
 
@@ -153,7 +145,7 @@ public class BookService {
         return null;
     }
 
-    public void increaseBookQuantity(Integer bookId) {
+    public void increaseAvailableStock(Integer bookId) {
         Optional<Book> bookOptional = bookRepository.findById(bookId);
         if (bookOptional.isPresent()) {
             if (bookOptional.get().getAvailableCopies() >= 1) {
