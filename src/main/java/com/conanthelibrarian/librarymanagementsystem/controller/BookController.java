@@ -113,11 +113,11 @@ public class BookController {
     }
 
     @PostMapping("/new/book/{bookId}/user/{userId}")
-    public ResponseEntity<String> openNewLoanIfAvailable(@PathVariable Integer bookId, @PathVariable Integer userId,
+    public ResponseEntity<String> openNewLoanIfAvailable(@PathVariable String bookId, @PathVariable String userId,
                                                          @RequestBody LoanDTO loanDTO) {
-        bookService.openNewLoanAndReduceStockIfAvailable(bookId, userId, loanDTO);
         try {
-            if (bookService.isBookAvailable(bookId)) {
+            if (bookService.isBookAvailable(Integer.parseInt(bookId))) {
+                bookService.openNewLoanAndReduceStockIfAvailable(Integer.parseInt(bookId), Integer.parseInt(userId), loanDTO);
                 log.info("Book available with Id: {}", bookId);
                 log.info("New loan saved");
                 return ResponseEntity.status(200).body("The book is available, new loan saved");

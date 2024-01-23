@@ -124,24 +124,6 @@ class UserServiceTest {
         Mockito.verify(userMapper).userDTOToUser(userDTO);
     }
 
-    //todo CORREGIR
-    /*@Test
-    @DisplayName("Create New User Internal Server Error")
-    public void createNewUserInternalServerErrorTest() {
-
-        //Given:
-        //User user = new User();
-        UserDTO userDTO = null;
-        //When:
-        //doThrow(new RuntimeException("this is an error")).when(userRepository).save(user);
-        //Then:
-        userService.createNewUser(userDTO);
-        //Mockito.verify(userRepository, never()).save(Mockito.any());
-        assertThrows(Exception.class, () -> {
-            userService.createNewUser(userDTO);
-        });
-    }*/
-
     @Test
     @DisplayName("Modify User")
     public void modifyUserTest() {
@@ -236,12 +218,18 @@ class UserServiceTest {
     public void findBookPerUserTest() {
         //Given:
         Integer userId = 1;
-        BookDTO bookDTO = BookDTO.builder().author("author").build();
+        Book book = Book.builder()
+                .bookId(2)
+                .author("author").build();
+        BookDTO bookDTO = BookDTO.builder()
+                .bookId(2)
+                .author("author").build();
         List<Loan> loanList = List.of(Loan.builder()
                 .userId(1)
                 .bookId(2)
                 .build());
-        List<Book> bookList = List.of(Book.builder().author("author").build());
+        List<Book> bookList = List.of(book);
+        List<BookDTO> bookDTOList = List.of(bookDTO);
         //When:
         when(userService.findLoanPerUser(userId)).thenReturn(loanList);
         when(bookRepository.findAll()).thenReturn(bookList);

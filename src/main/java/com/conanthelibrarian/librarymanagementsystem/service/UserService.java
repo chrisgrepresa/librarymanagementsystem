@@ -77,10 +77,9 @@ public class UserService {
                     .map(bookMapper::bookToBookDTO)
                     .collect(Collectors.toList());
             log.info("List of books for userId{} : {} ", userId, bookDTOList);
-
         }
         log.info("Does not work");
-        return null;
+        return null; //el problema puede que esté aquí
     }
 
 

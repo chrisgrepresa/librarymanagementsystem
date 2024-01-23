@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-//@MockitoSettings(strictness = Strictness.LENIENT)
 class BookServiceTest {
 
     @InjectMocks
@@ -89,7 +88,6 @@ class BookServiceTest {
         //Then:
         Optional<BookDTO> result = bookService.findBookById(bookId);
         assertTrue(result.isEmpty());
-
     }
 
     @Test
@@ -111,20 +109,6 @@ class BookServiceTest {
         bookService.createNewBook(bookDTO);
         verify(bookRepository, times(1)).save(book);
         Mockito.verify(bookMapper).bookDTOToBook(bookDTO);
-    }
-
-    //todo CORREGIR
-    @Test
-    @DisplayName("Create New Book Internal Server Error")
-    public void createNewBookInternalServerErrorTest() {
-        /*Book book = Book.builder().build();
-        BookDTO bookDTO = BookDTO.builder()
-                .bookId(1).build();
-        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
-        doThrow(new RuntimeException("this is an error")).when(bookRepository).save(book);
-        bookService.createNewBook(bookDTO);
-        Mockito.verify(bookRepository, never()).save(Mockito.any());
-        */
     }
 
     @Test
@@ -194,13 +178,10 @@ class BookServiceTest {
         assertEquals("author", bookService.findBookByGenre(stringGenre).get(0).getAuthor());
     }
 
-    //todo CORREGIR
     @Test
     @DisplayName("Find Book by Genre No Content")
-    public void findBookByGenreNoContestTest(){
+    public void findBookByGenreNoContestTest() {
         String stringGenre = "stringGenre";
-        List<BookDTO> bookDTOList = List.of();
-        when(bookRepository.findBookByGenre(stringGenre)).thenReturn(bookDTOList);
         bookService.filterBook(stringGenre);
         assertTrue(bookService.filterBook(stringGenre).isEmpty());
     }
@@ -227,33 +208,100 @@ class BookServiceTest {
         //Given:
         Integer bookId = 1;
         Integer userId = 2;
-        LoanDTO loanDTO = LoanDTO.builder().loanId(3).build();
-        boolean resultAvailable = true;
-        Book book = Book.builder().author("author").build();
-        BookDTO bookDTO = BookDTO.builder().author("author").build();
-        Optional<Book> bookOptional = Optional.of(Book.builder().author("author").build());
+        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+                .bookId(1)
+                .availableCopies(3)
+                .build());
+        List<LoanDTO> loanDTOList = List.of(LoanDTO.builder()
+                .loanId(3)
+                .bookId(1)
+                .userId(2)
+                .build());
+        LoanDTO loanDTO = LoanDTO.builder()
+                .loanId(3)
+                .userId(2)
+                .bookId(1)
+                .build();
         //When:
         when(bookRepository.findById(Mockito.anyInt())).thenReturn(bookOptional);
-        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
-        when(bookService.isBookAvailable(Mockito.anyInt())).thenReturn(resultAvailable);
+        when(loanService.findAllLoan()).thenReturn(loanDTOList);
         //Then:
-        bookService.createNewLoanIfAvailable(bookId, userId, loanDTO);
         bookService.openNewLoanAndReduceStockIfAvailable(bookId, userId, loanDTO);
-        Mockito.verify(loanService).createNewLoan(Mockito.any());
+        assertTrue(bookService.isBookAvailable(bookId));
+        assertEquals(3, bookService.findLoanId(bookId, userId));
+        Mockito.verify(loanService).createNewLoan(loanDTO);
+        Mockito.verify(bookRepository).save(bookOptional.get());
+    }
 
+    @Test
+    @DisplayName("Open New Loan And Reduce Stock If Available No Book Available")
+    public void openNewLoanAndReduceStockIfAvailableNoBookAvailableTest() {
+        //Given:
+        Integer bookId = 1;
+        Integer userId = 2;
+        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+                .bookId(1)
+                .availableCopies(0)
+                .build());
+        List<LoanDTO> loanDTOList = List.of(LoanDTO.builder()
+                .loanId(3)
+                .bookId(1)
+                .userId(2)
+                .build());
+        LoanDTO loanDTO = LoanDTO.builder()
+                .loanId(3)
+                .userId(2)
+                .bookId(1)
+                .build();
+        //When:
+        when(bookRepository.findById(Mockito.anyInt())).thenReturn(bookOptional);
+        //Then:
+        bookService.openNewLoanAndReduceStockIfAvailable(bookId, userId, loanDTO);
+        assertFalse(bookService.isBookAvailable(bookId));
+        Mockito.verify(loanService, never()).createNewLoan(loanDTO);
+        Mockito.verify(bookRepository, never()).save(bookOptional.get());
+    }
+
+    @Test
+    @DisplayName("Open New Loan And Reduce Stock If Available Wrong Path Variable")
+    public void openNewLoanAndReduceStockIfAvailableWrongPathVariableTest() {
+        String bookId = "ñ";
+        Integer userId = 2;
+        LoanDTO loanDTO = new LoanDTO();
+        assertThrows(Exception.class, () -> {
+            bookService.openNewLoanAndReduceStockIfAvailable(Integer.parseInt(bookId), userId, loanDTO);
+        });
+    }
+
+    @Test
+    @DisplayName("Open New Loan And Reduce Stock If Available Not Found")
+    public void openNewLoanAndReduceStockIfAvailableNotFoundTest() {
+        //Given:
+        Integer bookId = 1;
+        Integer userId = 2;
+        Optional<Book> bookOptional = Optional.empty();
+        LoanDTO loanDTO = LoanDTO.builder()
+                .loanId(3)
+                .userId(2)
+                .bookId(1)
+                .build();
+        //When:
+        when(bookRepository.findById(Mockito.anyInt())).thenReturn(bookOptional);
+        //Then:
+        bookService.openNewLoanAndReduceStockIfAvailable(bookId, userId, loanDTO);
+        assertFalse(bookService.isBookAvailable(bookId));
     }
 
 
     @Test
     @DisplayName("Delete Loan And Increase Stock If Available")
-    public void deleteLoanAndIncreaseStockIfAvailable(){
-        /*//Given:
+    public void deleteLoanAndIncreaseStockIfAvailableTest() {
+        //Given:
         Integer bookId = 1;
         Integer userId = 2;
-        Integer loanId = 3;
         Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
                 .bookId(1)
-                .availableCopies(4)
+                .availableCopies(3)
                 .build());
         List<LoanDTO> loanDTOList = List.of(LoanDTO.builder()
                 .loanId(3)
@@ -262,30 +310,125 @@ class BookServiceTest {
                 .build());
         //When:
         when(bookRepository.findById(Mockito.anyInt())).thenReturn(bookOptional);
-        //when(bookService.isBookAvailable(Mockito.anyInt())).thenReturn(true);
-        when(bookService.findLoanId(bookId, userId))
-                .thenReturn(loanId);
+        when(loanService.findAllLoan()).thenReturn(loanDTOList);
         //Then:
         bookService.deleteLoanAndIncreaseStockIfAvailable(bookId, userId);
-        Mockito.verify(loanService).deleteLoanById(loanId);*/
+        assertTrue(bookService.isBookAvailable(bookId));
+        assertEquals(3, bookService.findLoanId(bookId, userId));
+        Mockito.verify(loanService).deleteLoanById(Mockito.anyInt());
+        Mockito.verify(bookRepository).save(bookOptional.get());
+    }
+
+    @Test
+    @DisplayName("Delete Loan And Increase Stock If Available No Book Available")
+    public void deleteLoanAndIncreaseStockIfAvailableNoBookAvailableTest() {
+        //Given:
+        Integer bookId = 1;
+        Integer userId = 2;
+        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+                .bookId(1)
+                .availableCopies(0)
+                .build());
+        List<LoanDTO> loanDTOList = List.of(LoanDTO.builder()
+                .loanId(3)
+                .bookId(1)
+                .userId(2)
+                .build());
+        //When:
+        when(bookRepository.findById(Mockito.anyInt())).thenReturn(bookOptional);
+        //Then:
+        bookService.deleteLoanAndIncreaseStockIfAvailable(bookId, userId);
+        assertFalse(bookService.isBookAvailable(bookId));
+        Mockito.verify(loanService, never()).deleteLoanById(bookId);
+        Mockito.verify(bookRepository, never()).save(bookOptional.get());
+    }
+
+    @Test
+    @DisplayName("Delete Loan And Increase Stock If Available Wrong Path Variable")
+    public void deleteLoanAndIncreaseStockIfAvailableWrongPathVariableTest() {
+        String bookId = "ñ";
+        Integer userId = 2;
+        LoanDTO loanDTO = new LoanDTO();
+        assertThrows(Exception.class, () -> {
+            bookService.deleteLoanAndIncreaseStockIfAvailable(Integer.parseInt(bookId), userId);
+        });
+    }
+
+    @Test
+    @DisplayName("Delete Loan And Increase Stock If  Not Found")
+    public void deleteLoanAndIncreaseStockIfAvailableNotFoundTest() {
+        //Given:
+        Integer bookId = 1;
+        Integer userId = 2;
+        Optional<Book> bookOptional = Optional.empty();
+        //When:
+        when(bookRepository.findById(Mockito.anyInt())).thenReturn(bookOptional);
+        //Then:
+        bookService.deleteLoanAndIncreaseStockIfAvailable(bookId, userId);
+        assertFalse(bookService.isBookAvailable(bookId));
     }
 
     @Test
     @DisplayName("Filter Book")
     public void filterBookTest() {
-        /*
-        Given:
+        //Given:
         String parameter = "parameter";
-        List<Book> bookList = List.of(new Book(1, "title", "parameter", 1l, "genre", 2));
-        List<BookDTO> bookDTOList = List.of(new BookDTO(1, "title", "parameter", 1l, "genre", 2));
+        Book book = Book.builder()
+                .bookId(1)
+                .author("parameter")
+                .title("parameter")
+                .genre("parameter")
+                .build();
+        BookDTO bookDTO = BookDTO.builder()
+                .bookId(1)
+                .author("parameter")
+                .build();
+        List<Book> bookList = List.of(book);
+        List<BookDTO> bookDTOList = List.of(bookDTO);
         //When:
         when(bookRepository.findAll()).thenReturn(bookList);
-        when(bookRepository.findAll().stream().filter(any()).collect(any())).thenReturn(bookDTOList);
-        when(bookRepository.findAll().get(any())).thenReturn(bookList.get(any()));
+        when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
         //Then:
         List<BookDTO> result = bookService.filterBook(parameter);
-        assertFalse(result.isEmpty());
-        assertEquals(parameter, result.get(0).getAuthor());*/
+        assertEquals(1, result.size());
+        assertEquals(parameter, result.get(0).getAuthor());
+    }
+
+    @Test
+    @DisplayName("Filter Book No Content")
+    public void filterBookNoContentTest() {
+        //Given:
+        String parameter = "parameter";
+        Book book = new Book();
+        BookDTO bookDTO = new BookDTO();
+        List<Book> bookList = List.of(book);
+        //When:
+        when(bookRepository.findAll()).thenReturn(bookList);
+        //Then:
+        List<BookDTO> result = bookService.filterBook(parameter);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Filter Book No Parameter")
+    public void filterBookNoParameterTest() {
+        //Given:
+        String parameter = "parameter";
+        Book book = Book.builder()
+                .bookId(1)
+                .author("author")
+                .build();
+        BookDTO bookDTO = BookDTO.builder()
+                .bookId(1)
+                .author("author")
+                .build();
+        List<Book> bookList = List.of(book);
+        List<BookDTO> bookDTOList = List.of(bookDTO);
+        //When:
+        when(bookRepository.findAll()).thenReturn(bookList);
+        //Then:
+        List<BookDTO> result = bookService.filterBook(parameter);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -328,6 +471,18 @@ class BookServiceTest {
         });
     }
 
+    @Test
+    @DisplayName("Is Book Available Not Found")
+    public void isBookAvailableNotFoundTest() {
+        //Given:
+        Integer bookId = 1;
+        Optional<Book> bookOptional = Optional.empty();
+        //When:
+        when(bookRepository.findById(Mockito.anyInt())).thenReturn(bookOptional);
+        //Then:
+        assertFalse(bookService.isBookAvailable(bookId));
+    }
+
 
     @Test
     @DisplayName("Create New Loan If Available")
@@ -345,22 +500,10 @@ class BookServiceTest {
         Mockito.verify(loanService).createNewLoan(loanDTO);
     }
 
-    @Test
-    @DisplayName("Create New Loan If Available No Content bookId")
-    public void createNewLoanIfAvailableNoContentTest(){
-        //todo ESTE ES EL MISMO CASO QUE CREATE
-        /*Given
-        Integer bookId = 1;
-        Integer userId = 2;
-        LoanDTO loanDTO = new LoanDTO();
-        //Then
-        assertThrows(Exception.class, () -> {
-            bookService.createNewLoanIfAvailable(bookId, userId, loanDTO);
-        });*/
-    }
+
     @Test
     @DisplayName("Create New Loan If Available Wrong Path Variable")
-    public void createNewLoanIfAvailableWrongPathVariableBookIdTest(){
+    public void createNewLoanIfAvailableWrongPathVariableBookIdTest() {
         //Given
         String bookId = "ñ";
         Integer userId = 2;

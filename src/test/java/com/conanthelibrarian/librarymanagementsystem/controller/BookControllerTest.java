@@ -2,6 +2,7 @@ package com.conanthelibrarian.librarymanagementsystem.controller;
 
 import com.conanthelibrarian.librarymanagementsystem.dao.Book;
 import com.conanthelibrarian.librarymanagementsystem.dto.BookDTO;
+import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.service.BookService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,7 +71,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("Find Book By Id Wrong Path Variable Result")
+    @DisplayName("Find Book By Id Wrong Path Variable")
     public void findBookByIdWrongPathVariableTest(){
         String id= "ñ";
         assertThrows(Exception.class,() -> {
@@ -275,9 +276,114 @@ class BookControllerTest {
         ResponseEntity<List<BookDTO>> result = bookController.filterBook(parameter);
         assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
     }
-    //Given:
-    //When:
-    //Then:
 
-    //todo OpenNewLoan
+    @Test
+    @DisplayName("Open New Loan If Available")
+    public void openNewLoanIfAvailableTest(){
+        //Given:
+        String bookId = "1";
+        String userId = "2";
+        LoanDTO loanDTO = LoanDTO.builder()
+                .loanId(3)
+                .userId(2)
+                .bookId(1)
+                .build();
+
+        //When:
+        when(bookService.isBookAvailable(Mockito.anyInt())).thenReturn(true);
+        //Then:
+        ResponseEntity<String> result = bookController.openNewLoanIfAvailable(bookId, userId, loanDTO);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Open New Loan If Available Not Found")
+    public void openNewLoanIfAvailableNotFoundTest(){
+        //Given:
+        String bookId = "1";
+        String userId = "2";
+        LoanDTO loanDTO = LoanDTO.builder()
+                .loanId(3)
+                .userId(2)
+                .bookId(1)
+                .build();
+
+        //When:
+        when(bookService.isBookAvailable(Mockito.anyInt())).thenReturn(false);
+        //Then:
+        ResponseEntity<String> result = bookController.openNewLoanIfAvailable(bookId, userId, loanDTO);
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Open New Loan If Available Wrong Path Variable")
+    public void openNewLoanIfAvailableWrongPathVariableTest(){
+        //When:
+        String bookId = "ñ";
+        String userId = "ñ";
+        LoanDTO loanDTO = new LoanDTO();
+        //Then:
+        ResponseEntity<String> result = bookController.openNewLoanIfAvailable
+                (bookId, userId, loanDTO);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Delete Loan If Available")
+    public void deleteLoanIfAvailableTest(){
+        //Given:
+        String bookId = "1";
+        String userId = "2";
+        //When:
+        when(bookService.isBookAvailable(Mockito.anyInt())).thenReturn(true);
+        //Then:
+        ResponseEntity<String> result = bookController.deleteLoanIfAvailable(bookId, userId);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Delete Loan If Available Not Found")
+    public void deleteLoanIfAvailableNotFoundTest(){
+        //Given:
+        String bookId = "1";
+        String userId = "2";
+        //When:
+        when(bookService.isBookAvailable(Mockito.anyInt())).thenReturn(false);
+        //Then:
+        ResponseEntity<String> result = bookController.deleteLoanIfAvailable(bookId, userId);
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+    }
+
+
+    @Test
+    @DisplayName("Delete Loan If Available Wrong Path Variable")
+    public void deleteLoanIfAvailableWrongPathVariableTest(){
+        //Given:
+        String bookId = "ñ";
+        String userId = "ñ";
+        //Then:
+        ResponseEntity<String> result = bookController.deleteLoanIfAvailable(bookId,userId);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Reduce Available Stock")
+    public void reduceAvailableStockTest(){
+        //Given:
+        String bookId = "1";
+        //Then:
+        ResponseEntity<String> result = bookController.reduceAvailableStock(bookId);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Reduce Available Stock Internal Server Error")
+    public void reduceAvailableInternalServerErrorTest(){
+        //Given:
+        String bookId = "ñ";
+        //Then:
+        ResponseEntity<String> result = bookController.reduceAvailableStock(bookId);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+    }
+
 }
