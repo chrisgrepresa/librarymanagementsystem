@@ -29,13 +29,13 @@ public class UserController {
         return new ResponseEntity<>(userService.findAllUser(), HttpStatus.OK);
     }
 
-    @GetMapping("/find/{id}")
-    public ResponseEntity<Optional<UserDTO>> findUserById(@PathVariable String id) {
-        if (userService.findUserById(Integer.parseInt(id)).isEmpty()) {
-            log.info("User not found with ID:{}", id);
-            return new ResponseEntity<>(userService.findUserById(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
+    @GetMapping("/find/{userId}")
+    public ResponseEntity<Optional<UserDTO>> findUserById(@PathVariable String userId) {
+        if (userService.findUserById(Integer.parseInt(userId)).isEmpty()) {
+            log.info("User not found with ID:{}", userId);
+            return new ResponseEntity<>(userService.findUserById(Integer.parseInt(userId)), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(userService.findUserById(Integer.parseInt(id)), HttpStatus.OK);
+        return new ResponseEntity<>(userService.findUserById(Integer.parseInt(userId)), HttpStatus.OK);
     }
 
     @PostMapping("/new")
@@ -50,23 +50,29 @@ public class UserController {
         }
     }
 
-    @PutMapping("/modify/{id}")
-    public ResponseEntity<String> modifyUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
+    @PutMapping("/modify/{userId}")
+    public ResponseEntity<String> modifyUser(@PathVariable String userId, @RequestBody UserDTO userDTO) {
         try {
-            userService.modifyUser(Integer.parseInt(id), userDTO);
-            log.info("New user modified");
-            return ResponseEntity.status(200).body("New user modified");
+            if(userService.findUserById(Integer.parseInt(userId)).isEmpty()){
+                log.info("User not found");
+                return ResponseEntity.status(404).body("User not found");
+            }
+            else{
+                userService.modifyUser(userDTO.getUserId(), userDTO);
+                log.info("User modified");
+                return ResponseEntity.status(200).body("User modified");
+            }
         } catch (Exception e) {
             log.info("Error when saving user: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving user:" + e.getMessage());
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable String id) {
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable String userId) {
         try {
-            userService.deleteUserById(Integer.parseInt(id));
-            log.info("User deleted with Id: {}", id);
+            userService.deleteUserById(Integer.parseInt(userId));
+            log.info("User deleted with Id: {}", userId);
             return ResponseEntity.status(200).body("User deleted");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error when deleting user: " +

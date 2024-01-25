@@ -99,7 +99,7 @@ class UserControllerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
 
-    /*@Test
+    @Test
     @DisplayName("Modify User")
     public void modifyUserTest(){
         String id = "1";
@@ -109,9 +109,9 @@ class UserControllerTest {
         ResponseEntity<String> result = userController.modifyUser(id, userDTO);
         assertEquals("User modified", result.getBody());
         assertEquals(HttpStatus.OK, result.getStatusCode());
-    }*/
+    }
 
-    /*@Test
+    @Test
     @DisplayName("Modify User Not Found")
     public void modifyUserNotFoundTest(){
         String id= "1";
@@ -120,7 +120,7 @@ class UserControllerTest {
         when(userService.findUserById(Mockito.anyInt())).thenReturn(optionalUserDTO);
         ResponseEntity<String> result = userController.modifyUser(id,userDTO);
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-    }*/
+    }
 
     @Test
     @DisplayName("Modify User Internal Server Error")

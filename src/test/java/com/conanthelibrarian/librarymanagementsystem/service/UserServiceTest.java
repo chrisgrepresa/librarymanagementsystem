@@ -48,13 +48,15 @@ class UserServiceTest {
     @Mock
     BookMapper bookMapper;
 
-//TODO CORREGIR SINGLETON
+
     @Test
     @DisplayName("Find All Users")
     public void findAllUserTest() {
-        User user = new User();
+        User user = User.builder()
+                .name("name")
+                .build();
         UserDTO userDTO = new UserDTO();
-        List<User> userList = Collections.singletonList(user);
+        List<User> userList = List.of(user);
         when(userRepository.findAll()).thenReturn(userList);
         when(userMapper.userToUserDTO(any(User.class))).thenReturn(userDTO);
         List<UserDTO> result = userService.findAllUser();

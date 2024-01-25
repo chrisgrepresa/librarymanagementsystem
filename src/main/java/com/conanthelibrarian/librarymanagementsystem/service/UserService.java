@@ -34,8 +34,8 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<UserDTO> findUserById(Integer id) {
-        return userRepository.findById(id).stream()
+    public Optional<UserDTO> findUserById(Integer userId) {
+        return userRepository.findById(userId).stream()
                 .map(userMapper::userToUserDTO)
                 .findAny();
     }
@@ -46,20 +46,19 @@ public class UserService {
         log.info("User saved with name: {}", userDTO.getName());
     }
 
-    public UserDTO modifyUser(Integer id, UserDTO userDTO) {
-        Optional<User> userOptional = userRepository.findById(id);
+    public void modifyUser(Integer userId, UserDTO userDTO) {
+        Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
             User user = userMapper.userDTOToUser(userDTO);
             userRepository.save(user);
             log.info("User modified with name: {}", userDTO.getName());
         }
-        return userDTO;
     }
 
-    public void deleteUserById(Integer id) {
-        if (id != null) {
-            userRepository.deleteById(id);
-            log.info("User deleted with id: {}", id);
+    public void deleteUserById(Integer userId) {
+        if (userId != null) {
+            userRepository.deleteById(userId);
+            log.info("User deleted with userId: {}", userId);
         }
     }
 

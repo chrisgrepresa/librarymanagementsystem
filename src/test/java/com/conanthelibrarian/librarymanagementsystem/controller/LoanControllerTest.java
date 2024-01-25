@@ -97,7 +97,7 @@ class LoanControllerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
 
-    /*@Test
+    @Test
     @DisplayName("Modify Loan")
     public void modifyLoanTest(){
         String id = "1";
@@ -107,9 +107,9 @@ class LoanControllerTest {
         ResponseEntity<String> result = loanController.modifyLoan(id, loanDTO);
         assertEquals("Loan modified", result.getBody());
         assertEquals(HttpStatus.OK, result.getStatusCode());
-    }*/
+    }
 
-    /*@Test
+    @Test
     @DisplayName("Modify Loan Not Found")
     public void modifyLoanNotFoundTest(){
         String id= "1";
@@ -118,7 +118,7 @@ class LoanControllerTest {
         when(loanService.findLoanById(Mockito.anyInt())).thenReturn(optionalLoanDTO);
         ResponseEntity<String> result = loanController.modifyLoan(id,loanDTO);
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-    }*/
+    }
 
     @Test
     @DisplayName("Modify Loan Internal Server Error")

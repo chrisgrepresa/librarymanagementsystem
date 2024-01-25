@@ -36,13 +36,14 @@ class LoanServiceTest {
     @Mock
     LoanMapper loanMapper;
 
-    //TODO CAMBIAR SINGLETON
     @Test
     @DisplayName("Find All Loans")
     public void findAllLoanTest() {
-        Loan loan = new Loan();
+        Loan loan = Loan.builder()
+                .userId(2)
+                .build();
         LoanDTO loanDTO = new LoanDTO();
-        List<Loan> loanList = Collections.singletonList(loan);
+        List<Loan> loanList = List.of(loan);
         when(loanRepository.findAll()).thenReturn(loanList);
         when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
         List<LoanDTO> result = loanService.findAllLoan();

@@ -23,44 +23,44 @@ public class LoanService {
     private final LoanMapper loanMapper;
 
 
-    public List<LoanDTO> findAllLoan(){
+    public List<LoanDTO> findAllLoan() {
         return loanRepository.findAll().stream()
                 .map(loanMapper::loanToLoanDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<LoanDTO> findLoanById(Integer id){
-        return loanRepository.findById(id).stream()
+    public Optional<LoanDTO> findLoanById(Integer loanId) {
+        return loanRepository.findById(loanId).stream()
                 .map(loanMapper::loanToLoanDTO)
                 .findAny();
     }
 
-    public void createNewLoan(LoanDTO loanDTO){
+    public void createNewLoan(LoanDTO loanDTO) {
         Loan loan = loanMapper.loanDTOToLoan(loanDTO);
         loanRepository.save(loan);
-        log.info("Loan saved with id: {}", loanDTO.getLoanId());
+        log.info("Loan saved with Id: {}", loanDTO.getLoanId());
     }
 
-    public LoanDTO modifyLoan(Integer id, LoanDTO loanDTO){
-        Optional<Loan> loanOptional = loanRepository.findById(id);
-        if(loanOptional.isPresent()){
+
+    public void modifyLoan(Integer loanId, LoanDTO loanDTO) {
+        Optional<Loan> loanOptional = loanRepository.findById(loanId);
+        if (loanOptional.isPresent()) {
             Loan loan = loanMapper.loanDTOToLoan(loanDTO);
             loanRepository.save(loan);
-            log.info("Loan modified with id: {}", loanDTO.getLoanId());
-        }
-        return loanDTO;
-    }
-
-    public void deleteLoanById(Integer id) {
-        if(id != null){
-            loanRepository.deleteById(id);
+            log.info("Loan modified with Id: {}", loanDTO.getLoanId());
         }
     }
 
-    public String calculateFees(Integer loanId, LocalDate localDate){
-        Integer days = (int)ChronoUnit.DAYS.between(findLoanById(loanId).get().getDueDate(), localDate);
+    public void deleteLoanById(Integer loanId) {
+        if (loanId != null) {
+            loanRepository.deleteById(loanId);
+        }
+    }
+
+    public String calculateFees(Integer loanId, LocalDate localDate) {
+        Integer days = (int) ChronoUnit.DAYS.between(findLoanById(loanId).get().getDueDate(), localDate);
         switch ((1 <= days && days <= 5) ? 1 : (6 <= days && days <= 15) ? 2
-                : (16 <= days && days <= 29) ? 3 : (30 <= days) ? 4 : 5){
+                : (16 <= days && days <= 29) ? 3 : (30 <= days) ? 4 : 5) {
             case 1 -> {
                 log.info("First fee");
                 Double fee = days * 0.10;

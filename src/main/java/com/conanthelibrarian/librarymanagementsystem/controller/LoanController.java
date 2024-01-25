@@ -29,13 +29,13 @@ public class LoanController {
         return new ResponseEntity<>(loanService.findAllLoan(), HttpStatus.OK);
     }
 
-    @GetMapping("/find/{id}")
-    public ResponseEntity<Optional<LoanDTO>> findLoanById(@PathVariable String id) {
-        if (loanService.findLoanById(Integer.parseInt(id)).isEmpty()) {
-            log.info("Loan not found with ID:{}", id);
-            return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(id)), HttpStatus.NOT_FOUND);
+    @GetMapping("/find/{loanId}")
+    public ResponseEntity<Optional<LoanDTO>> findLoanById(@PathVariable String loanId) {
+        if (loanService.findLoanById(Integer.parseInt(loanId)).isEmpty()) {
+            log.info("Loan not found with ID:{}", loanId);
+            return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(loanId)), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(id)), HttpStatus.OK);
+        return new ResponseEntity<>(loanService.findLoanById(Integer.parseInt(loanId)), HttpStatus.OK);
     }
 
 
@@ -51,23 +51,30 @@ public class LoanController {
         }
     }
 
-    @PutMapping("/modify/{id}")
-    public ResponseEntity<String> modifyLoan(@PathVariable String id, @RequestBody LoanDTO loanDTO) {
+    @PutMapping("/modify/{loanId}")
+    public ResponseEntity<String> modifyLoan(@PathVariable String loanId, @RequestBody LoanDTO loanDTO) {
         try {
-            loanService.modifyLoan(Integer.parseInt(id), loanDTO);
-            log.info("New loan modified");
-            return ResponseEntity.status(200).body("New loan modified");
+            if(loanService.findLoanById(Integer.parseInt(loanId)).isEmpty()){
+                log.info("Loan not found");
+                return ResponseEntity.status(404).body("Loan not found");
+            }
+            else {
+                loanService.modifyLoan(loanDTO.getLoanId(), loanDTO);
+                log.info("Loan modified");
+                return ResponseEntity.status(200).body("Loan modified");
+            }
         } catch (Exception e) {
             log.info("Error when saving loan: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving loan:" + e.getMessage());
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteLoan(@PathVariable String id) {
+
+    @DeleteMapping("/delete/{loanId}")
+    public ResponseEntity<String> deleteLoan(@PathVariable String loanId) {
         try {
-            loanService.deleteLoanById(Integer.parseInt(id));
-            log.info("Loan deleted with Id: {}", id);
+            loanService.deleteLoanById(Integer.parseInt(loanId));
+            log.info("Loan deleted with Id: {}", loanId);
             return ResponseEntity.status(200).body("Loan deleted");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error when deleting loan: " +
@@ -75,14 +82,14 @@ public class LoanController {
         }
     }
 
-    @GetMapping("/fee/{id}/{localDate}")
-    public ResponseEntity<String> calculateFee(@PathVariable String id,
+    @GetMapping("/fee/{loanId}/{localDate}")
+    public ResponseEntity<String> calculateFee(@PathVariable String loanId,
                                                @PathVariable String localDate) {
 
-        if (loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)) == null) {
-            return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.NO_CONTENT);
+        if (loanService.calculateFees(Integer.parseInt(loanId), LocalDate.parse(localDate)) == null) {
+            return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(loanId), LocalDate.parse(localDate)), HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(id), LocalDate.parse(localDate)), HttpStatus.OK);
+        return new ResponseEntity<>(loanService.calculateFees(Integer.parseInt(loanId), LocalDate.parse(localDate)), HttpStatus.OK);
     }
 
 

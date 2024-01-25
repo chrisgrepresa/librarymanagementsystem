@@ -97,38 +97,36 @@ class BookControllerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
 
-    //TODO CORREGIR
-    /*@Test
+    @Test
     @DisplayName("Modify Book")
     public void modifyBookTest(){
-        String id = "1";
+        String bookId = "1";
         Optional<BookDTO> optionalBookDTO = Optional.of(BookDTO.builder().author("author").build());
-        BookDTO bookDTO = BookDTO.builder().author("author").build();
+        BookDTO bookDTO = new BookDTO();
         when(bookService.findBookById(Mockito.anyInt())).thenReturn(optionalBookDTO);
-        ResponseEntity<String> result = bookController.modifyBook(bookDTO);
-        assertEquals("Book modified", result.getBody());
+        ResponseEntity<String> result = bookController.modifyBook(bookId, bookDTO);
         assertEquals(HttpStatus.OK, result.getStatusCode());
-    }*/
+    }
 
-    /*@Test
+    @Test
     @DisplayName("Modify Book Not Found")
     public void modifyBookNotFoundTest(){
-        String id= "1";
+        String bookId= "1";
         Optional<BookDTO> optionalBookDTO = Optional.empty();
         BookDTO bookDTO = new BookDTO();
         when(bookService.findBookById(Mockito.anyInt())).thenReturn(optionalBookDTO);
-        ResponseEntity<String> result = bookController.modifyBook(bookDTO);
+        ResponseEntity<String> result = bookController.modifyBook(bookId,bookDTO);
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-    }*/
+    }
 
-    /*@Test
+    @Test
     @DisplayName("Modify Book Internal Server Error")
     public void modifyBookInternalServerErrorTest(){
-        String id= "ñ";
+        String bookId= "ñ";
         BookDTO bookDTO = BookDTO.builder().author("author").build();
-        ResponseEntity<String> result = bookController.modifyBook(bookDTO);
+        ResponseEntity<String> result = bookController.modifyBook(bookId, bookDTO);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
-    }*/
+    }
 
     @Test
     @DisplayName("Delete Book")

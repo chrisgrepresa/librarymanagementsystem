@@ -51,12 +51,18 @@ public class BookController {
         }
     }
 
-    @PutMapping("/modify")
-    public ResponseEntity<String> modifyBook(@RequestBody BookDTO bookDTO) {
+    @PutMapping("/modify/{bookId}")
+    public ResponseEntity<String> modifyBook(@PathVariable String bookId, @RequestBody BookDTO bookDTO) {
         try {
-            bookService.modifyBook(bookDTO.getBookId(), bookDTO);
-            log.info("New book modified");
-            return ResponseEntity.status(200).body("New book modified");
+            if(bookService.findBookById(Integer.parseInt(bookId)).isEmpty()){
+                log.info("Book not found");
+                return ResponseEntity.status(404).body("Book not found");
+            }
+            else{
+                bookService.modifyBook(bookDTO.getBookId(), bookDTO);
+                log.info("Book modified");
+                return ResponseEntity.status(200).body("Book modified");
+            }
         } catch (Exception e) {
             log.info("Error when saving book: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error when saving book:" + e.getMessage());
