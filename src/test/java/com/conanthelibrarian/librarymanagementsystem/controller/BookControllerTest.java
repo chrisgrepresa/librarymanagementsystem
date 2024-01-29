@@ -33,8 +33,13 @@ class BookControllerTest {
     @Test
     @DisplayName("Find All Book")
     public void findAllBookTest(){
-        List<BookDTO> bookDTOList = List.of(new BookDTO(2, "title", "author", 1l, "genre", 3));
+        //Given:
+        List<BookDTO> bookDTOList = List.of(BookDTO.builder()
+                .author("author")
+                .build());
+        //When:
         when(bookService.findAllBook()).thenReturn(bookDTOList);
+        //Then:
         ResponseEntity<List<BookDTO>> result = bookController.findAllBook();
         assertEquals("author", result.getBody().get(0).getAuthor());
     }
@@ -42,8 +47,11 @@ class BookControllerTest {
     @Test
     @DisplayName("Find All Book No Content Result")
     public void findAllBookNoContentTest(){
+        //Given:
         List<BookDTO> bookDTOList = List.of();
+        //When:
         when(bookService.findAllBook()).thenReturn(bookDTOList);
+        //Then:
         ResponseEntity<List<BookDTO>> result = bookController.findAllBook();
         assertTrue(result.getBody().isEmpty());
         assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
@@ -52,9 +60,14 @@ class BookControllerTest {
     @Test
     @DisplayName("Find Book By Id")
     public void findBookByIdTest(){
+        //Given:
         String id = "1";
-        Optional<BookDTO> optionalBookDTO = Optional.of(BookDTO.builder().author("author").build());
+        Optional<BookDTO> optionalBookDTO = Optional.of(BookDTO.builder()
+                .author("author")
+                .build());
+        //When:
         when(bookService.findBookById(Mockito.anyInt())).thenReturn(optionalBookDTO);
+        //Then:
         ResponseEntity<Optional<BookDTO>> result = bookController.findBookById(id);
         assertEquals("author", result.getBody().get().getAuthor());
     }
@@ -62,9 +75,12 @@ class BookControllerTest {
     @Test
     @DisplayName("Find Book By Id Not Found Result")
     public void findBookByIdNotFoundTest(){
+        //Given:
         String id= "1";
         Optional<BookDTO> optionalBookDTO = Optional.empty();
+        //When:
         when(bookService.findBookById(Mockito.anyInt())).thenReturn(optionalBookDTO);
+        //Then:
         ResponseEntity<Optional<BookDTO>> result = bookController.findBookById(id);
         assertTrue(result.getBody().isEmpty());
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
@@ -82,7 +98,11 @@ class BookControllerTest {
     @Test
     @DisplayName("Create New Book")
     public void createNewBookTest(){
-        BookDTO bookDTO = BookDTO.builder().author("author").build();
+        //Given:
+        BookDTO bookDTO = BookDTO.builder()
+                .author("author")
+                .build();
+        //Then:
         ResponseEntity<String> result = bookController.createNewBook(bookDTO);
         assertEquals("New book saved", result.getBody());
         assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -91,8 +111,13 @@ class BookControllerTest {
     @Test
     @DisplayName("Create New Book Internal Server Error")
     public void createNewBookInternalServerErrorTest(){
-        BookDTO bookDTO = BookDTO.builder().author("author").build();
+        //Given:
+        BookDTO bookDTO = BookDTO.builder()
+                .author("author")
+                .build();
+        //When:
         doThrow(new RuntimeException("this is an error")).when(bookService).createNewBook(bookDTO);
+        //Then:
         ResponseEntity<String> result = bookController.createNewBook(bookDTO);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
@@ -100,39 +125,62 @@ class BookControllerTest {
     @Test
     @DisplayName("Modify Book")
     public void modifyBookTest(){
-        String bookId = "1";
-        Optional<BookDTO> optionalBookDTO = Optional.of(BookDTO.builder().author("author").build());
-        BookDTO bookDTO = new BookDTO();
+        //Given:
+        BookDTO bookDTO = BookDTO.builder()
+                .bookId(1)
+                .build();
+        Optional<BookDTO> optionalBookDTO = Optional.of(BookDTO.builder()
+                .bookId(1)
+                .build());
+        //When:
         when(bookService.findBookById(Mockito.anyInt())).thenReturn(optionalBookDTO);
-        ResponseEntity<String> result = bookController.modifyBook(bookId, bookDTO);
+        //Then:
+        ResponseEntity<String> result = bookController.modifyBook(bookDTO);
         assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 
     @Test
     @DisplayName("Modify Book Not Found")
     public void modifyBookNotFoundTest(){
-        String bookId= "1";
+        //Given:
+        BookDTO bookDTO = BookDTO.builder()
+                .bookId(1)
+                .build();
         Optional<BookDTO> optionalBookDTO = Optional.empty();
-        BookDTO bookDTO = new BookDTO();
+        //When:
         when(bookService.findBookById(Mockito.anyInt())).thenReturn(optionalBookDTO);
-        ResponseEntity<String> result = bookController.modifyBook(bookId,bookDTO);
+        //Then:
+        ResponseEntity<String> result = bookController.modifyBook(bookDTO);
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 
     @Test
     @DisplayName("Modify Book Internal Server Error")
     public void modifyBookInternalServerErrorTest(){
-        String bookId= "ñ";
-        BookDTO bookDTO = BookDTO.builder().author("author").build();
-        ResponseEntity<String> result = bookController.modifyBook(bookId, bookDTO);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+        //Given:
+        BookDTO bookDTO = BookDTO.builder()
+                .bookId(1)
+                .build();
+        Optional<BookDTO> optionalBookDTO = Optional.of(BookDTO.builder()
+                .bookId(1)
+                .build());
+        //When:
+        when(bookService.findBookById(Mockito.anyInt())).thenReturn(optionalBookDTO);
+        doThrow(new RuntimeException("this is an error")).when(bookService).modifyBook(bookDTO);
+        //Then:
+        ResponseEntity<String> result = bookController.modifyBook(bookDTO);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());;
     }
 
     @Test
     @DisplayName("Delete Book")
     public void deleteBookTest(){
+        //Given:
         String id= "1";
-        BookDTO bookDTO = BookDTO.builder().author("author").build();
+        BookDTO bookDTO = BookDTO.builder()
+                .author("author")
+                .build();
+        //Then:
         ResponseEntity<String> result = bookController.deleteBook(id);
         assertEquals("Book deleted", result.getBody());
         assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -141,8 +189,12 @@ class BookControllerTest {
     @Test
     @DisplayName("Delete Book Internal Server Error")
     public void deleteBookInternalServerErrorTest(){
+        //Given:
         String id= "ñ";
-        BookDTO bookDTO = BookDTO.builder().author("author").build();
+        BookDTO bookDTO = BookDTO.builder()
+                .author("author")
+                .build();
+        //Then:
         ResponseEntity<String> result = bookController.deleteBook(id);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
     }
@@ -150,9 +202,14 @@ class BookControllerTest {
     @Test
     @DisplayName("Find Book By Genre")
     public void findBookByGenreTest(){
+        //Given:
         String genre = "genre";
-        List<BookDTO> bookDTOList = List.of(BookDTO.builder().author("author").build());
+        List<BookDTO> bookDTOList = List.of(BookDTO.builder()
+                .author("author")
+                .build());
+        //When:
         when(bookService.findBookByGenre(genre)).thenReturn(bookDTOList);
+        //Then:
         ResponseEntity<List<BookDTO>> result = bookController.findBookByGenre(genre);
         assertEquals("author", result.getBody().get(0).getAuthor());
         assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -161,9 +218,12 @@ class BookControllerTest {
     @Test
     @DisplayName("Find Book By Genre No Content")
     public void findBookByGenreNotFoundTest(){
+        //Given:
         String genre = "genre";
         List<BookDTO> bookDTOList = List.of();
+        //Then:
         when(bookService.findBookByGenre(genre)).thenReturn(bookDTOList);
+        //Then:
         ResponseEntity<List<BookDTO>> result = bookController.findBookByGenre(genre);
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
@@ -171,9 +231,12 @@ class BookControllerTest {
     @Test
     @DisplayName("Find Book By Genre Wrong Path Variable")
     public void findBookByGenreWrongPathVariableTest(){
+        //Given:
         String genre= "ñ";
         List<BookDTO> bookDTOList = List.of();
+        //When:
         when(bookService.findBookByGenre(genre)).thenReturn(bookDTOList);
+        //Then:
         ResponseEntity<List<BookDTO>> result = bookController.findBookByGenre(genre);
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
@@ -181,11 +244,13 @@ class BookControllerTest {
     @Test
     @DisplayName("Find Book In Loan")
     public void findBookInLoanTest(){
-    //Given:
-        List<BookDTO> bookDTOList = List.of(BookDTO.builder().author("author").build());
-    //When:
+        //Given:
+        List<BookDTO> bookDTOList = List.of(BookDTO.builder()
+                .author("author")
+                .build());
+        //When:
         when(bookService.findBookInLoan()).thenReturn(bookDTOList);
-    //Then:
+        //Then:
         ResponseEntity<List<BookDTO>> result = bookController.findBookInLoan();
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals("author", result.getBody().get(0).getAuthor());
@@ -241,7 +306,9 @@ class BookControllerTest {
     public void filterBookTest(){
         //Given:
         String parameter = "parameter";
-        List<BookDTO> bookDTOList = List.of(BookDTO.builder().author("author").build());
+        List<BookDTO> bookDTOList = List.of(BookDTO.builder()
+                .author("author")
+                .build());
         //When:
         when(bookService.filterBook(Mockito.any())).thenReturn(bookDTOList);
         //Then:

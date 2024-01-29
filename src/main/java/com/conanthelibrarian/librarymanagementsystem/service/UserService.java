@@ -46,8 +46,8 @@ public class UserService {
         log.info("User saved with name: {}", userDTO.getName());
     }
 
-    public void modifyUser(Integer userId, UserDTO userDTO) {
-        Optional<User> userOptional = userRepository.findById(userId);
+    public void modifyUser(UserDTO userDTO) {
+        Optional<User> userOptional = userRepository.findById(userDTO.getUserId());
         if (userOptional.isPresent()) {
             User user = userMapper.userDTOToUser(userDTO);
             userRepository.save(user);

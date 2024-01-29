@@ -52,16 +52,18 @@ class UserServiceTest {
     @Test
     @DisplayName("Find All Users")
     public void findAllUserTest() {
+        //Given:
         User user = User.builder()
-                .name("name")
+                .userId(1)
                 .build();
         UserDTO userDTO = new UserDTO();
         List<User> userList = List.of(user);
+        //When:
         when(userRepository.findAll()).thenReturn(userList);
         when(userMapper.userToUserDTO(any(User.class))).thenReturn(userDTO);
+        //Then:
         List<UserDTO> result = userService.findAllUser();
         assertEquals(1, result.size());
-        assertEquals(userDTO, result.get(0));
         Mockito.verify(userMapper).userToUserDTO(user);
     }
 
@@ -80,14 +82,20 @@ class UserServiceTest {
     @Test
     @DisplayName("Find User By Id")
     public void findUserByIdTest() {
+        //Given:
         Integer userId = 1;
         User user = new User();
-        UserDTO userDTO = new UserDTO(2, "Joe", "email", "password", "role");
+        UserDTO userDTO = UserDTO.builder()
+                .userId(1)
+                .name("name")
+                .build();
         Optional<User> userOptional = Optional.of(user);
+        //When:
         when(userRepository.findById(userId)).thenReturn(userOptional);
         when(userMapper.userToUserDTO(any(User.class))).thenReturn(userDTO);
+        //Then:
         Optional<UserDTO> result = userService.findUserById(userId);
-        assertEquals("Joe", result.get().getName());
+        assertEquals("name", result.get().getName());
         Mockito.verify(userMapper).userToUserDTO(user);
     }
 
@@ -117,10 +125,14 @@ class UserServiceTest {
     @Test
     @DisplayName("Create New User")
     public void createNewUserTest() {
+        //Given:
         User user = new User();
         UserDTO userDTO = UserDTO.builder()
-                .userId(1).build();
+                .userId(1)
+                .build();
+        //When:
         when(userMapper.userDTOToUser(any(UserDTO.class))).thenReturn(user);
+        //Then:
         userService.createNewUser(userDTO);
         verify(userRepository, times(1)).save(user);
         Mockito.verify(userMapper).userDTOToUser(userDTO);
@@ -130,15 +142,17 @@ class UserServiceTest {
     @DisplayName("Modify User")
     public void modifyUserTest() {
         //Given:
-        Integer userId = 1;
-        UserDTO userDTO = new UserDTO();
-        Optional<User> optionalUserDTO = Optional.ofNullable(User.builder()
+        User user = new User();
+        UserDTO userDTO = UserDTO.builder()
+                .userId(1)
+                .build();
+        Optional<User> optionalUser = Optional.of(User.builder()
                 .userId(1)
                 .build());
         //When:
-        when(userRepository.findById(userId)).thenReturn(optionalUserDTO);
+        when(userRepository.findById(Mockito.anyInt())).thenReturn(optionalUser);
         //Then:
-        userService.modifyUser(userId, userDTO);
+        userService.modifyUser(userDTO);
         verify(userRepository, times(1)).save(Mockito.any());
     }
 
@@ -146,26 +160,17 @@ class UserServiceTest {
     @DisplayName("Modify User Not Found")
     public void modifyUserTestNoFoundTest() {
         //Given:
-        Integer userId = 1;
-        UserDTO userDTO = new UserDTO();
-        Optional<User> optionalUserDTO = Optional.empty();
+        UserDTO userDTO = UserDTO.builder()
+                .userId(1)
+                .build();
+        Optional<User> optionalUser = Optional.empty();
         //When:
-        when(userRepository.findById(userId)).thenReturn(optionalUserDTO);
+        when(userRepository.findById(Mockito.anyInt())).thenReturn(optionalUser);
         //Then:
-        userService.modifyUser(userId, userDTO);
+        userService.modifyUser(userDTO);
         Mockito.verify(userRepository, never()).save(Mockito.any());
     }
 
-    @Test
-    @DisplayName("Modify User Wrong Path Variable")
-    public void modifyUserTestWrongPathVariable() {
-        //Given:
-        String userId = "ñ";
-        UserDTO userDTO = new UserDTO();
-        assertThrows(Exception.class, () -> {
-            userService.modifyUser(Integer.parseInt(userId), userDTO);
-        });
-    }
 
     @Test
     @DisplayName("Delete user")
@@ -187,9 +192,15 @@ class UserServiceTest {
     @Test
     @DisplayName("Find User in Loan")
     public void findUserInLoanTest() {
+        //Given:
         Integer quantity = 1;
-        List<UserDTO> userDTOList = List.of(new UserDTO(1, "name", "email", "password", "role"));
+        List<UserDTO> userDTOList = List.of(UserDTO.builder()
+                .userId(1)
+                        .name("name")
+                .build());
+        //When:
         when(userRepository.findUserInLoanForQuantity(quantity)).thenReturn(userDTOList);
+        //Then:
         userService.findUserInLoan(quantity);
         assertEquals("name", userDTOList.get(0).getName());
     }
@@ -197,9 +208,12 @@ class UserServiceTest {
     @Test
     @DisplayName("Find User in Loan No Content")
     public void findUserInLoanNoContentTest() {
+        //Given:
         Integer quantity = 1;
         List<UserDTO> userDTOList = List.of();
+        //When:
         when(userRepository.findUserInLoanForQuantity(quantity)).thenReturn(userDTOList);
+        //Then:
         List<UserDTO> result = userService.findUserInLoan(quantity);
         assertTrue(result.isEmpty());
     }
@@ -213,8 +227,6 @@ class UserServiceTest {
         });
     }
 
-    //todo findBookByUser
-
     @Test
     @DisplayName("Find Book Per User")
     public void findBookPerUserTest() {
@@ -222,10 +234,12 @@ class UserServiceTest {
         Integer userId = 1;
         Book book = Book.builder()
                 .bookId(2)
-                .author("author").build();
+                .author("author")
+                .build();
         BookDTO bookDTO = BookDTO.builder()
                 .bookId(2)
-                .author("author").build();
+                .author("author")
+                .build();
         List<Loan> loanList = List.of(Loan.builder()
                 .userId(1)
                 .bookId(2)

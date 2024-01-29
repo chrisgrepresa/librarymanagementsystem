@@ -4,6 +4,7 @@ import com.conanthelibrarian.librarymanagementsystem.dao.Loan;
 import com.conanthelibrarian.librarymanagementsystem.dto.LoanDTO;
 import com.conanthelibrarian.librarymanagementsystem.mapper.LoanMapper;
 import com.conanthelibrarian.librarymanagementsystem.repository.LoanRepository;
+import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,13 +40,16 @@ class LoanServiceTest {
     @Test
     @DisplayName("Find All Loans")
     public void findAllLoanTest() {
+        //Given:
         Loan loan = Loan.builder()
                 .userId(2)
                 .build();
         LoanDTO loanDTO = new LoanDTO();
         List<Loan> loanList = List.of(loan);
+        //When:
         when(loanRepository.findAll()).thenReturn(loanList);
         when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
+        //Then:
         List<LoanDTO> result = loanService.findAllLoan();
         assertEquals(1, result.size());
         assertEquals(loanDTO, result.get(0));
@@ -67,14 +71,17 @@ class LoanServiceTest {
     @Test
     @DisplayName("Find Loan By Id")
     public void findLoanByIdTest() {
+        //Given:
         Integer loanId = 1;
-        LocalDate localDateStart = LocalDate.of(2023, 12, 28);
-        LocalDate localDateEnd = LocalDate.of(2023, 12, 30);
         Loan loan = new Loan();
-        LoanDTO loanDTO = new LoanDTO(2, 1, 1, localDateStart, localDateEnd);
+        LoanDTO loanDTO = LoanDTO.builder()
+                .loanDate(LocalDate.of(2023,12,28))
+                .build();
         Optional<Loan> loanOptional = Optional.of(loan);
+        //When:
         when(loanRepository.findById(loanId)).thenReturn(loanOptional);
         when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
+        //Then:
         Optional<LoanDTO> result = loanService.findLoanById(loanId);
         assertEquals(LocalDate.of(2023, 12, 28), result.get().getLoanDate());
         Mockito.verify(loanMapper).loanToLoanDTO(loan);
@@ -106,10 +113,14 @@ class LoanServiceTest {
     @Test
     @DisplayName("Create New Loan")
     public void createNewLoanTest() {
+        //Given:
         Loan loan = new Loan();
         LoanDTO loanDTO = LoanDTO.builder()
-                .loanId(1).build();
+                .loanId(1)
+                .build();
+        //When:
         when(loanMapper.loanDTOToLoan(any(LoanDTO.class))).thenReturn(loan);
+        //Then:
         loanService.createNewLoan(loanDTO);
         verify(loanRepository, times(1)).save(loan);
         Mockito.verify(loanMapper).loanDTOToLoan(loanDTO);
@@ -120,15 +131,16 @@ class LoanServiceTest {
     @DisplayName("Modify Loan")
     public void modifyLoanTest() {
         //Given:
-        Integer loanId = 1;
-        LoanDTO loanDTO = new LoanDTO();
-        Optional<Loan> optionalloanDTO = Optional.ofNullable(Loan.builder()
+        LoanDTO loanDTO = LoanDTO.builder()
+                .loanId(1)
+                .build();
+        Optional<Loan> optionalLoan = Optional.of(Loan.builder()
                 .loanId(1)
                 .build());
         //When:
-        when(loanRepository.findById(loanId)).thenReturn(optionalloanDTO);
+        when(loanRepository.findById(Mockito.anyInt())).thenReturn(optionalLoan);
         //Then:
-        loanService.modifyLoan(loanId, loanDTO);
+        loanService.modifyLoan(loanDTO);
         verify(loanRepository, times(1)).save(Mockito.any());
     }
 
@@ -136,25 +148,15 @@ class LoanServiceTest {
     @DisplayName("Modify Loan Not Found")
     public void modifyLoanTestNoFoundTest() {
         //Given:
-        Integer loanId = 1;
-        LoanDTO loanDTO = new LoanDTO();
-        Optional<Loan> optionalLoanDTO = Optional.empty();
+        LoanDTO loanDTO = LoanDTO.builder()
+                .loanId(1)
+                .build();
+        Optional<Loan> optionalLoan = Optional.empty();
         //When:
-        when(loanRepository.findById(loanId)).thenReturn(optionalLoanDTO);
+        when(loanRepository.findById(Mockito.anyInt())).thenReturn(optionalLoan);
         //Then:
-        loanService.modifyLoan(loanId, loanDTO);
+        loanService.modifyLoan(loanDTO);
         Mockito.verify(loanRepository, never()).save(Mockito.any());
-    }
-
-    @Test
-    @DisplayName("Modify Loan Wrong Path Variable")
-    public void modifyLoanTestWrongPathVariable() {
-        //Given:
-        String loanId = "ñ";
-        LoanDTO loanDTO = new LoanDTO();
-        assertThrows(Exception.class, () -> {
-            loanService.modifyLoan(Integer.parseInt(loanId), loanDTO);
-        });
     }
 
     @Test
@@ -179,15 +181,17 @@ class LoanServiceTest {
     public void calculateFeesCaseOneTest() {
         //Given:
         Integer loanId = 2;
-        LocalDate localDate = LocalDate.of(2023, 10, 8);
+        LocalDate localDateFeeOne = LocalDate.of(2023, 10, 8);
         Loan loan = new Loan();
         Optional<Loan> loanOptional = Optional.of(loan);
-        LoanDTO loanDTO = LoanDTO.builder().dueDate(LocalDate.of(2023,10,6)).build();
+        LoanDTO loanDTO = LoanDTO.builder()
+                .dueDate(LocalDate.of(2023,10,6))
+                .build();
         //When:
         when(loanRepository.findById(Mockito.anyInt())).thenReturn(loanOptional);
         when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
         //Then:
-        String result = loanService.calculateFees(loanId, localDate);
+        String result = loanService.calculateFees(loanId, localDateFeeOne);
         assertEquals(Constants.FEE_FIRST_TRANCHE + 2 + Constants.DELAY_DAYS_RESULT + 0.2,
                 result);
     }
@@ -197,15 +201,17 @@ class LoanServiceTest {
     public void calculateFeesCaseTwoTest() {
         //Given:
         Integer loanId = 2;
-        LocalDate localDate = LocalDate.of(2023, 10, 16);
+        LocalDate localDateFeeTwo = LocalDate.of(2023, 10, 16);
         Loan loan = new Loan();
         Optional<Loan> loanOptional = Optional.of(loan);
-        LoanDTO loanDTO = LoanDTO.builder().dueDate(LocalDate.of(2023,10,6)).build();
+        LoanDTO loanDTO = LoanDTO.builder()
+                .dueDate(LocalDate.of(2023,10,6))
+                .build();
         //When:
         when(loanRepository.findById(Mockito.anyInt())).thenReturn(loanOptional);
         when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
         //Then:
-        String result = loanService.calculateFees(loanId, localDate);
+        String result = loanService.calculateFees(loanId, localDateFeeTwo);
         assertEquals(Constants.FEE_SECOND_TRANCHE + 10 + Constants.DELAY_DAYS_RESULT + 2.5,
                 result);
     }
@@ -215,15 +221,17 @@ class LoanServiceTest {
     public void calculateFeesCaseThreeTest() {
         //Given:
         Integer loanId = 2;
-        LocalDate localDate = LocalDate.of(2023, 10, 26);
+        LocalDate localDateFeeThree = LocalDate.of(2023, 10, 26);
         Loan loan = new Loan();
         Optional<Loan> loanOptional = Optional.of(loan);
-        LoanDTO loanDTO = LoanDTO.builder().dueDate(LocalDate.of(2023,10,6)).build();
+        LoanDTO loanDTO = LoanDTO.builder()
+                .dueDate(LocalDate.of(2023,10,6))
+                .build();
         //When:
         when(loanRepository.findById(Mockito.anyInt())).thenReturn(loanOptional);
         when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
         //Then:
-        String result = loanService.calculateFees(loanId, localDate);
+        String result = loanService.calculateFees(loanId, localDateFeeThree);
         assertEquals(Constants.FEE_THIRD_TRANCHE + 20 + Constants.DELAY_DAYS_RESULT + 10.0,
                 result);
     }
@@ -233,15 +241,17 @@ class LoanServiceTest {
     public void calculateFeesCaseFourTest() {
         //Given:
         Integer loanId = 2;
-        LocalDate localDate = LocalDate.of(2023, 12, 10);
+        LocalDate localDateFeeFour = LocalDate.of(2023, 12, 10);
         Loan loan = new Loan();
         Optional<Loan> loanOptional = Optional.of(loan);
-        LoanDTO loanDTO = LoanDTO.builder().dueDate(LocalDate.of(2023,10,6)).build();
+        LoanDTO loanDTO = LoanDTO.builder()
+                .dueDate(LocalDate.of(2023,10,6))
+                .build();
         //When:
         when(loanRepository.findById(Mockito.anyInt())).thenReturn(loanOptional);
         when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);
         //Then:
-        String result = loanService.calculateFees(loanId, localDate);
+        String result = loanService.calculateFees(loanId, localDateFeeFour);
         assertEquals(Constants.FEE_FOURTH_TRANCHE + 65 + Constants.DELAY_DAYS_RESULT + 65.0,
                 result);
     }
@@ -254,7 +264,9 @@ class LoanServiceTest {
         LocalDate localDate = LocalDate.of(2012, 12, 10);
         Loan loan = new Loan();
         Optional<Loan> loanOptional = Optional.of(loan);
-        LoanDTO loanDTO = LoanDTO.builder().dueDate(LocalDate.of(2023,10,06)).build();
+        LoanDTO loanDTO = LoanDTO.builder()
+                .dueDate(LocalDate.of(2023,10,6))
+                .build();
         //When:
         when(loanRepository.findById(Mockito.anyInt())).thenReturn(loanOptional);
         when(loanMapper.loanToLoanDTO(any(Loan.class))).thenReturn(loanDTO);

@@ -51,15 +51,15 @@ public class LoanController {
         }
     }
 
-    @PutMapping("/modify/{loanId}")
-    public ResponseEntity<String> modifyLoan(@PathVariable String loanId, @RequestBody LoanDTO loanDTO) {
+    @PutMapping("/modify")
+    public ResponseEntity<String> modifyLoan(@RequestBody LoanDTO loanDTO) {
         try {
-            if(loanService.findLoanById(Integer.parseInt(loanId)).isEmpty()){
+            if(loanService.findLoanById(loanDTO.getLoanId()).isEmpty()){
                 log.info("Loan not found");
                 return ResponseEntity.status(404).body("Loan not found");
             }
             else {
-                loanService.modifyLoan(loanDTO.getLoanId(), loanDTO);
+                loanService.modifyLoan(loanDTO);
                 log.info("Loan modified");
                 return ResponseEntity.status(200).body("Loan modified");
             }

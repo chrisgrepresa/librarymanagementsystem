@@ -42,8 +42,8 @@ public class LoanService {
     }
 
 
-    public void modifyLoan(Integer loanId, LoanDTO loanDTO) {
-        Optional<Loan> loanOptional = loanRepository.findById(loanId);
+    public void modifyLoan(LoanDTO loanDTO) {
+        Optional<Loan> loanOptional = loanRepository.findById(loanDTO.getLoanId());
         if (loanOptional.isPresent()) {
             Loan loan = loanMapper.loanDTOToLoan(loanDTO);
             loanRepository.save(loan);

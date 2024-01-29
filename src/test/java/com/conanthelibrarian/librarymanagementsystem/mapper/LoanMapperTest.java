@@ -21,9 +21,9 @@ class LoanMapperTest {
     @Test
     @DisplayName("LoanDTO to Loan")
     public void loanDTOToLoanTest(){
-        LocalDate localDateStart = LocalDate.of(2023,12,28);
-        LocalDate localDateEnd = LocalDate.of(2023,12,30);
-        LoanDTO loanDTO = new LoanDTO(2, 1,1, localDateStart, localDateEnd);
+        LoanDTO loanDTO = LoanDTO.builder()
+                .bookId(1)
+                .build();
         Loan loan = loanMapper.loanDTOToLoan(loanDTO);
         assertEquals(1, loanDTO.getBookId());
     }
@@ -38,9 +38,9 @@ class LoanMapperTest {
     @Test
     @DisplayName("Loan To LoanDTO")
     public void loanToLoanDTOTest(){
-        LocalDate localDateStart = LocalDate.of(2023,12,28);
-        LocalDate localDateEnd = LocalDate.of(2023,12,30);
-        Loan loan = new Loan(2, 1,1, localDateStart, localDateEnd);
+        Loan loan = Loan.builder()
+                .bookId(1)
+                .build();
         LoanDTO loanDTO = loanMapper.loanToLoanDTO(loan);
         assertEquals(1, loan.getBookId());
     }

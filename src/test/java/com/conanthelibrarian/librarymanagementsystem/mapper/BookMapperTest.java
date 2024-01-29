@@ -20,7 +20,9 @@ class BookMapperTest {
     @Test
     @DisplayName("BookDTO to Book")
     public void bookDTOToBookTest(){
-        BookDTO bookDTO = new BookDTO(1, "title", "author", 1L, "genre", 3);
+        BookDTO bookDTO = BookDTO.builder()
+                .title("title")
+                .build();
         Book book = bookMapper.bookDTOToBook(bookDTO);
         assertEquals("title", bookDTO.getTitle());
     }
@@ -36,7 +38,9 @@ class BookMapperTest {
     @Test
     @DisplayName("Book to BookDTO")
     public void bookToBookDTOTest(){
-        Book book = new Book(2, "title", "author", 1L, "genre", 3);
+        Book book = Book.builder()
+                .author("author")
+                .build();
         BookDTO bookDTO = bookMapper.bookToBookDTO(book);
         assertEquals("author", book.getAuthor());
     }

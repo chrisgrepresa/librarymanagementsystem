@@ -63,12 +63,18 @@ class BookServiceTest {
     @Test
     @DisplayName("Find Book By Id")
     public void findBookByIdTest() {
+        //Given:
         Integer bookId = 1;
         Book book = new Book();
-        BookDTO bookDTO = new BookDTO(1, "title", "author", 1l, "genre", 3);
+        BookDTO bookDTO = BookDTO.builder()
+                .bookId(1)
+                .author("author")
+                .build();
         Optional<Book> bookOptional = Optional.of(book);
+        //When:
         when(bookRepository.findById(bookId)).thenReturn(bookOptional);
         when(bookMapper.bookToBookDTO(any(Book.class))).thenReturn(bookDTO);
+        //Then:
         Optional<BookDTO> result = bookService.findBookById(bookId);
         assertEquals("author", result.get().getAuthor());
         Mockito.verify(bookMapper).bookToBookDTO(book);
@@ -99,10 +105,13 @@ class BookServiceTest {
     @Test
     @DisplayName("Create New Book")
     public void createNewBookTest() {
+        //Given:
         Book book = new Book();
         BookDTO bookDTO = BookDTO.builder()
                 .bookId(1).build();
+        //When:
         when(bookMapper.bookDTOToBook(any(BookDTO.class))).thenReturn(book);
+        //Then:
         bookService.createNewBook(bookDTO);
         verify(bookRepository, times(1)).save(book);
         Mockito.verify(bookMapper).bookDTOToBook(bookDTO);
@@ -113,14 +122,16 @@ class BookServiceTest {
     public void modifyBookTest() {
         //Given:
         Integer bookId = 1;
-        BookDTO bookDTO = new BookDTO();
-        Optional<Book> optionalBookDTO = Optional.ofNullable(Book.builder()
+        BookDTO bookDTO = BookDTO.builder()
+                .bookId(1)
+                .build();
+        Optional<Book> optionalBook = Optional.of(Book.builder()
                 .bookId(1)
                 .build());
         //When:
-        when(bookRepository.findById(bookId)).thenReturn(optionalBookDTO);
+        when(bookRepository.findById(bookId)).thenReturn(optionalBook);
         //Then:
-        bookService.modifyBook(bookId, bookDTO);
+        bookService.modifyBook(bookDTO);
         verify(bookRepository, times(1)).save(Mockito.any());
     }
 
@@ -128,25 +139,15 @@ class BookServiceTest {
     @DisplayName("Modify Book Not Found")
     public void modifyBookTestNoFoundTest() {
         //Given:
-        Integer bookId = 1;
-        BookDTO bookDTO = new BookDTO();
+        BookDTO bookDTO = BookDTO.builder()
+                .bookId(1)
+                .build();
         Optional<Book> optionalBookDTO = Optional.empty();
         //When:
-        when(bookRepository.findById(bookId)).thenReturn(optionalBookDTO);
+        when(bookRepository.findById(Mockito.anyInt())).thenReturn(optionalBookDTO);
         //Then:
-        bookService.modifyBook(bookId, bookDTO);
+        bookService.modifyBook(bookDTO);
         Mockito.verify(bookRepository, never()).save(Mockito.any());
-    }
-
-    @Test
-    @DisplayName("Modify Book Wrong Path Variable")
-    public void modifyBookTestWrongPathVariable() {
-        //Given:
-        String bookId = "ñ";
-        BookDTO bookDTO = new BookDTO();
-        assertThrows(Exception.class, () -> {
-            bookService.modifyBook(Integer.parseInt(bookId), bookDTO);
-        });
     }
 
     @Test
@@ -169,34 +170,53 @@ class BookServiceTest {
     @Test
     @DisplayName("Find Book by Genre")
     public void findBookByGenreTest() {
+        //Given:
         String stringGenre = "stringGenre";
-        List<BookDTO> bookDTOList = List.of(new BookDTO(1, "title", "author", 1l, "genre", 2));
+        List<BookDTO> bookDTOList = List.of(BookDTO.builder()
+                .bookId(1)
+                .author("author")
+                .build());
+        //When:
         when(bookRepository.findBookByGenre(stringGenre)).thenReturn(bookDTOList);
-        assertEquals("author", bookService.findBookByGenre(stringGenre).get(0).getAuthor());
+        //Then:
+        List<BookDTO> result = bookService.findBookByGenre(stringGenre);
+        assertEquals("author", result.get(0).getAuthor());
     }
 
     @Test
     @DisplayName("Find Book by Genre No Content")
     public void findBookByGenreNoContestTest() {
         String stringGenre = "stringGenre";
-        bookService.filterBook(stringGenre);
-        assertTrue(bookService.filterBook(stringGenre).isEmpty());
+        List<BookDTO> bookDTOList = List.of();
+        List<BookDTO> result = bookService.filterBook(stringGenre);
+        assertTrue(result.isEmpty());
     }
 
     @Test
     @DisplayName("Find Book In Loan")
     public void findBookInLoanTest() {
-        List<BookDTO> bookDTOList = List.of(new BookDTO(1, "title", "author", 1l, "genre", 2));
+        //Given:
+        List<BookDTO> bookDTOList = List.of(BookDTO.builder()
+                .bookId(1)
+                .author("author")
+                .build());
+        //When:
         when(bookRepository.findBooksInLoan()).thenReturn(bookDTOList);
-        assertEquals("author", bookService.findBookInLoan().get(0).getAuthor());
+        //Then:
+        List<BookDTO> result = bookService.findBookInLoan();
+        assertEquals("author", result.get(0).getAuthor());
     }
 
     @Test
     @DisplayName("Find Book In Loan No Content")
     public void findBookInLoanNoContentTest() {
+        //Given:
         List<BookDTO> bookDTOList = List.of();
+        //When:
         when(bookRepository.findBooksInLoan()).thenReturn(bookDTOList);
-        assertTrue(bookService.findBookInLoan().isEmpty());
+        //Then:
+        List<BookDTO> result = bookService.findBookInLoan();
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -205,7 +225,7 @@ class BookServiceTest {
         //Given:
         Integer bookId = 1;
         Integer userId = 2;
-        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+        Optional<Book> bookOptional = Optional.of(Book.builder()
                 .bookId(1)
                 .availableCopies(3)
                 .build());
@@ -236,7 +256,7 @@ class BookServiceTest {
         //Given:
         Integer bookId = 1;
         Integer userId = 2;
-        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+        Optional<Book> bookOptional = Optional.of(Book.builder()
                 .bookId(1)
                 .availableCopies(0)
                 .build());
@@ -296,7 +316,7 @@ class BookServiceTest {
         //Given:
         Integer bookId = 1;
         Integer userId = 2;
-        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+        Optional<Book> bookOptional = Optional.of(Book.builder()
                 .bookId(1)
                 .availableCopies(3)
                 .build());
@@ -322,7 +342,7 @@ class BookServiceTest {
         //Given:
         Integer bookId = 1;
         Integer userId = 2;
-        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+        Optional<Book> bookOptional = Optional.of(Book.builder()
                 .bookId(1)
                 .availableCopies(0)
                 .build());
@@ -433,14 +453,15 @@ class BookServiceTest {
     public void isBookAvailableTest() {
         //Given:
         Integer bookId = 1;
-        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+        Optional<Book> bookOptional = Optional.of(Book.builder()
                 .bookId(1)
                 .availableCopies(3)
                 .build());
         //When:
         when(bookRepository.findById(Mockito.anyInt())).thenReturn(bookOptional);
         //Then:
-        assertTrue(bookService.isBookAvailable(bookId));
+        boolean result = bookService.isBookAvailable(bookId);
+        assertTrue(result);
     }
 
     @Test
@@ -448,7 +469,7 @@ class BookServiceTest {
     public void isBookAvailableNotAvailableTest() {
         //Given:
         Integer bookId = 1;
-        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+        Optional<Book> bookOptional = Optional.of(Book.builder()
                 .bookId(1)
                 .availableCopies(0)
                 .build());
@@ -477,7 +498,8 @@ class BookServiceTest {
         //When:
         when(bookRepository.findById(Mockito.anyInt())).thenReturn(bookOptional);
         //Then:
-        assertFalse(bookService.isBookAvailable(bookId));
+        boolean result = bookService.isBookAvailable(bookId);
+        assertFalse(result);
     }
 
 
@@ -520,7 +542,7 @@ class BookServiceTest {
     public void reduceBookAvailabilityTest() {
         //Given:
         Integer bookId = 1;
-        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+        Optional<Book> bookOptional = Optional.of(Book.builder()
                 .bookId(1)
                 .availableCopies(2)
                 .build());
@@ -547,13 +569,13 @@ class BookServiceTest {
     @Test
     @DisplayName("Reduce Book Availability But Not Available")
     public void reduceBookAvailabilityNotAvailable() {
-        //given:
+        //Given:
         Integer bookId = 1;
-        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+        Optional<Book> bookOptional = Optional.of(Book.builder()
                 .bookId(1)
                 .availableCopies(0)
                 .build());
-        //when:
+        //When:
         when(bookRepository.findById(bookId)).thenReturn(bookOptional);
         //Then:
         bookService.reduceAvailableStock(bookId);
@@ -633,7 +655,7 @@ class BookServiceTest {
     public void increaseBookAvailabilityTest() {
         //Given:
         Integer bookId = 1;
-        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+        Optional<Book> bookOptional = Optional.of(Book.builder()
                 .bookId(1)
                 .availableCopies(2)
                 .build());
@@ -662,7 +684,7 @@ class BookServiceTest {
     public void increaseBookAvailabilityNotAvailable() {
         //Given:
         Integer bookId = 1;
-        Optional<Book> bookOptional = Optional.ofNullable(Book.builder()
+        Optional<Book> bookOptional = Optional.of(Book.builder()
                 .bookId(1)
                 .availableCopies(0)
                 .build());
@@ -672,5 +694,4 @@ class BookServiceTest {
         bookService.increaseAvailableStock(bookId);
         Mockito.verify(bookRepository, never()).save(Mockito.any());
     }
-
 }

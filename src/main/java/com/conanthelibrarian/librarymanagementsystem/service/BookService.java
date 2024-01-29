@@ -41,8 +41,8 @@ public class BookService {
         log.info("Book saved with title: {}", bookDTO.getTitle());
     }
 
-    public void modifyBook(Integer bookId, BookDTO bookDTO) {
-        Optional<Book> bookOptional = bookRepository.findById(bookId);
+    public void modifyBook(BookDTO bookDTO) {
+        Optional<Book> bookOptional = bookRepository.findById(bookDTO.getBookId());
         if (bookOptional.isPresent()) {
             Book book = bookMapper.bookDTOToBook(bookDTO);
             bookRepository.save(book);

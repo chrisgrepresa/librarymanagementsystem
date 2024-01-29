@@ -50,15 +50,15 @@ public class UserController {
         }
     }
 
-    @PutMapping("/modify/{userId}")
-    public ResponseEntity<String> modifyUser(@PathVariable String userId, @RequestBody UserDTO userDTO) {
+    @PutMapping("/modify")
+    public ResponseEntity<String> modifyUser(@RequestBody UserDTO userDTO) {
         try {
-            if(userService.findUserById(Integer.parseInt(userId)).isEmpty()){
+            if(userService.findUserById(userDTO.getUserId()).isEmpty()){
                 log.info("User not found");
                 return ResponseEntity.status(404).body("User not found");
             }
             else{
-                userService.modifyUser(userDTO.getUserId(), userDTO);
+                userService.modifyUser(userDTO);
                 log.info("User modified");
                 return ResponseEntity.status(200).body("User modified");
             }

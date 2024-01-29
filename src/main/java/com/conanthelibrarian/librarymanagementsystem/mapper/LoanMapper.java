@@ -14,7 +14,7 @@ public class LoanMapper {
             return null;
         }
         Loan loan = new Loan();
-        loan.setLoanId(loan.getLoanId());
+        loan.setLoanId(loanDTO.getLoanId());
         loan.setUserId(loanDTO.getUserId());
         loan.setBookId(loanDTO.getBookId());
         loan.setLoanDate(loanDTO.getLoanDate());

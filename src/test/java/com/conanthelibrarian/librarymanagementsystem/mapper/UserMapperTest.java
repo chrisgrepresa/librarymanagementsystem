@@ -19,9 +19,11 @@ class UserMapperTest {
     @Test
     @DisplayName("UserDTO To User")
     public void userDTOToUserTest(){
-        UserDTO userDTO = new UserDTO(2, "Joe", "email", "password", "role");
+        UserDTO userDTO = UserDTO.builder()
+                .name("name")
+                .build();
         User user = userMapper.userDTOToUser(userDTO);
-        assertEquals("Joe", userDTO.getName());
+        assertEquals("name", userDTO.getName());
     }
 
     @Test
@@ -35,9 +37,11 @@ class UserMapperTest {
     @Test
     @DisplayName("User To UserDTO")
     public void userToUserDTOTest(){
-        User user = new User(2, "Joe", "email", "password", "role");
+        User user = User.builder()
+                .name("name")
+                .build();
         UserDTO userDTO = userMapper.userToUserDTO(user);
-        assertEquals("Joe", user.getName());
+        assertEquals("name", user.getName());
     }
 
     @Test

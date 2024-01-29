@@ -51,15 +51,15 @@ public class BookController {
         }
     }
 
-    @PutMapping("/modify/{bookId}")
-    public ResponseEntity<String> modifyBook(@PathVariable String bookId, @RequestBody BookDTO bookDTO) {
+    @PutMapping("/modify")
+    public ResponseEntity<String> modifyBook(@RequestBody BookDTO bookDTO) {
         try {
-            if(bookService.findBookById(Integer.parseInt(bookId)).isEmpty()){
+            if(bookService.findBookById(bookDTO.getBookId()).isEmpty()){
                 log.info("Book not found");
                 return ResponseEntity.status(404).body("Book not found");
             }
             else{
-                bookService.modifyBook(bookDTO.getBookId(), bookDTO);
+                bookService.modifyBook(bookDTO);
                 log.info("Book modified");
                 return ResponseEntity.status(200).body("Book modified");
             }
